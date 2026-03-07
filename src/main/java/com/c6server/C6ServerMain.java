@@ -149,14 +149,14 @@ public class C6ServerMain {
             System.out.printf("%02X ", b);
         }
 
-        System.out.println("");
+        System.out.println();
 
         System.out.print("NICK ENCODED: ");
         for (byte b : nickEncode) {
             System.out.printf("%02X ", b);
         }
 
-        System.out.println("");
+        System.out.println();
 
         LoginEntity loginEntity = new LoginEntity();
         loginEntity.setNick(nickAscii);
@@ -310,8 +310,8 @@ public class C6ServerMain {
                 xorBlock[i] = (byte) ((block[i] & 0xFF) ^ (xorKey[i] & 0xFF)); // XOR tra i valori unsigned
 
                 // Stampiamo il risultato
-                System.out.println(String.format("block[%d] = 0x%02X, xorKey[%d] = 0x%02X, result = 0x%02X",
-                        i, block[i], i, xorKey[i], xorBlock[i]));
+                System.out.printf("block[%d] = 0x%02X, xorKey[%d] = 0x%02X, result = 0x%02X%n",
+                        i, block[i], i, xorKey[i], xorBlock[i]);
 
                 decodeBlock.add(xorBlock[i]);
 
