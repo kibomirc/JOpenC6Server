@@ -4,6 +4,7 @@ import com.c6server.c6enum.C6EnumClient;
 import com.c6server.entity.InfoLoginEntity;
 import com.c6server.entity.LoginEntity;
 import com.c6server.entity.WelcomeEntity;
+import com.c6server.utils.HttpServerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +23,8 @@ public class C6ServerMain {
 
     private static final Logger logger = LogManager.getLogger(C6ServerMain.class);
     public static void main(String[] args) throws IOException {
+
+        HttpServerUtils.startServer();
 
         /*
             Mettiamoci in ascolto sulla 4800 tcp
@@ -74,11 +77,11 @@ public class C6ServerMain {
                         InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
                         infoLoginEntity.setCount(2);
                         //numBanner attualmente solo uno
-                        infoLoginEntity.setGif("/Users/ivan/Desktop/dragon-ball-dragon-ball-z.gif");
-                        infoLoginEntity.setLinkBanner("https://www.google.it");
-                        infoLoginEntity.setNome("JC6");
+                        infoLoginEntity.setGif("http://localhost/images/banner1.gif");
+                        infoLoginEntity.setLinkBanner("http://www.google.it");
+                        infoLoginEntity.setNome("banner1");
                         infoLoginEntity.setId("1");
-                        infoLoginEntity.setLinkButton("https://www.google.it");
+                        infoLoginEntity.setLinkButton("http://www.google.it");
                         infoLoginEntity.setDescr("JC6Server");
 
                         byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();

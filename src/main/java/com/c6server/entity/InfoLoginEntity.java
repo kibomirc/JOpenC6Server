@@ -126,11 +126,12 @@ public class InfoLoginEntity {
         return "1".getBytes(StandardCharsets.UTF_8);
     }
 
-    public byte[] getId() {
+    public byte[] getId(String id) {
         int idNum = Integer.parseInt(id);
 
         byte[] value = new byte[1];
-        value[0] = (byte) (0x48 + idNum);
+        // 48 (ASCII di '0') + 1 = 49 (che è 0x31 in esadecimale)
+        value[0] = (byte) (48 + idNum);
 
         return value;
     }
@@ -168,7 +169,7 @@ public class InfoLoginEntity {
         int lenBanner = getLengthWithLinkBanner().length; // LenLinkBanner + LinkBanner
         int lenName = getLengthWithName().length; // lenNome + nome
         int lenButton = getNumeroPulsanti().length; // numPulsanti
-        int lenId = getId().length; // Id
+        int lenId = getId(id).length; // Id
         int lenLink = getLengthWithLinkButton().length; // lenLinkButton + linkButton
         int lenDescr = getLengthWithDescr().length; // LenDescr + Descr
 
@@ -189,7 +190,7 @@ public class InfoLoginEntity {
         infoLoginComposit.write(getLengthWithName());
         infoLoginComposit.write(getNumeroPulsanti());
         infoLoginComposit.write(UNKNOWBYTE_2);
-        infoLoginComposit.write(getId());
+        infoLoginComposit.write(getId("1"));
         infoLoginComposit.write(getLengthWithLinkButton());
         infoLoginComposit.write(getLengthWithDescr());
         infoLoginComposit.write(UNKNOWBYTE_3);
