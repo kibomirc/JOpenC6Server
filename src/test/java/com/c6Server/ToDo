@@ -1,0 +1,8 @@
+Bisogna fixare la infoLogin per quanto riguarda la lunghezza
+se è due byte deve ritornare ad esempio 00 04 e non solo 04 deve essere espressa su due byte
+
+bisogna creare un piccolo httpServer in grado di servire almeno un immagine di un banner cosi
+vediamo se il client prova a scaricarla. l indirizzo sarà http://127.0.0.1:80/percorso_immagine.gif
+e poi lanciamo un log
+
+fix : ho messo come banner 1 ma ritorna 31 vedere dovrebbe ritornare 00 01 sempre espressa sue due byte (sempre da verificare)
