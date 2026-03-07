@@ -5,6 +5,3 @@ nell installer c6-4.2.c6tinb426.exe
 
 Attualmente sono supportante solo le codifiche e la parte di crittografia del nickname e della password.
 
-
-Si ringrazia Alessio (BigAlex) Periloso per aver effettuato il reversing del protocollo.
-
