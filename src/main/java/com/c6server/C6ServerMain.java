@@ -1,6 +1,7 @@
 package com.c6server;
 
 import com.c6server.c6enum.C6EnumClient;
+import com.c6server.c6enum.C6EnumServer;
 import com.c6server.entity.InfoLoginEntity;
 import com.c6server.entity.LoginEntity;
 import com.c6server.entity.WelcomeEntity;
@@ -20,106 +21,132 @@ import java.util.Arrays;
 import java.util.List;
 
 public class C6ServerMain {
-
     private static final Logger logger = LogManager.getLogger(C6ServerMain.class);
+
     public static void main(String[] args) throws IOException {
 
-        HttpServerUtils.startServer();
+        // server http per infoLogin
+        new Thread(() -> { // lo metto in un thread separato per buona pratica
+            try {
+                HttpServerUtils.startServer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
 
         /*
             Mettiamoci in ascolto sulla 4800 tcp
          */
-        ServerSocket serverSocket = new ServerSocket(4800);
-        while (true) {
-            try (Socket c6socket = serverSocket.accept()) {
-                InputStream in = c6socket.getInputStream();
-                OutputStream out = c6socket.getOutputStream();
 
-                byte[] heloProtocol = {
-                        0x20, 0x12, 0x00, 0x01, 0x00, 0x0B, 0x00, 0x02, 0x08
-                };
-                byte[] key = codKey(); // key da inviare al client
-                byte[] heloMessage = new byte[heloProtocol.length + key.length];
+        new Thread(() -> { // thread esterno solo per sviluppi futuri
+            try (ServerSocket serverSocket = new ServerSocket(4800)) {
+                while (true) {
+                    Socket c6socket = serverSocket.accept();
+                    new Thread(() -> { // gestione più client
+                        try (Socket s = c6socket;
+                             InputStream in = s.getInputStream();
+                             OutputStream out = s.getOutputStream()) {
 
-                System.arraycopy(heloProtocol, 0, heloMessage, 0, heloProtocol.length);
-                System.arraycopy(key, 0, heloMessage, heloProtocol.length, key.length);
+                            byte[] heloProtocol = {
+                                    0x20, 0x12, 0x00, 0x01, 0x00, 0x0B, 0x00, 0x02, 0x08
+                            };
+                            byte[] key = codKey(); // key da inviare al client
+                            byte[] heloMessage = new byte[heloProtocol.length + key.length];
 
-                out.write(heloMessage);
-                out.flush();
+                            System.arraycopy(heloProtocol, 0, heloMessage, 0, heloProtocol.length);
+                            System.arraycopy(key, 0, heloMessage, heloProtocol.length, key.length);
 
-                byte[] buffer = new byte[1024];
-                int bytesRead = 0;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    byte[] data = Arrays.copyOf(buffer, bytesRead);
-                    // Generare la oroderKey
-                    byte[] orderKey = reorderKey(key);
-                    // Decodificare i dati
-                    byte[] decodePacket = decodePacket(data, orderKey);
-                    byte cmdClient = extractCmdClient(decodePacket);
-                    if(cmdClient == C6EnumClient.LOGIN.getCode()) {
-                        System.out.println("Il client sta effettuando il login");
-                        // TODO IMPLEMENTARE LOGICHE CHECK
-                        // Passare i dati decodificati alla loginData prelevando l' oggetto loginEntity
-                        LoginEntity loginEntity = new LoginEntity();
-                        loginEntity = loginData(decodePacket);
-                        // Codificare il nickname e confrontarlo con quello della loginData
-                        boolean nickCheck = checkC6Control(key, loginEntity.getNick(), loginEntity.getNickEncoded(), false);
-                        // Codificare la password (memorizzata in futuro su redis) e confrotnarla con quella della logindata
-                        // per il momento l'unica password accettata è "password" bisogna implementare un meccanismo di registrazione
-                        // e di prelievo della password
-                        boolean passCheck = checkC6Control(key,"password", loginEntity.getPassEncoded(),true);
-                        // Se i controlli sono entrambi true andare avanti (poi dovrò gestire l errore della password sbagliata o dell'utente già connesso.
-                        if(!nickCheck) { System.out.println("Lo spooffing non è consetito su questo server!!! Verrai segnalato"); return; }
-                        if(!passCheck) { System.out.println("Password Sbagliata!");} else { System.out.println("Password corretta! ... procediamo con autenticazione");}
+                            out.write(heloMessage);
+                            out.flush();
 
-                        // TODO IMPLEMENTARE LA INFOLOGIN
+                            byte[] buffer = new byte[1024];
+                            int bytesRead = 0;
+                            while ((bytesRead = in.read(buffer)) != -1) {
+                                byte[] data = Arrays.copyOf(buffer, bytesRead);
+                                // Generare la oroderKey
+                                byte[] orderKey = reorderKey(key);
+                                // Decodificare i dati
+                                byte[] decodePacket = decodePacket(data, orderKey);
+                                byte cmdClient = extractCmdClient(decodePacket);
+                                if (cmdClient == C6EnumClient.LOGIN.getCode()) {
+                                    System.out.println("Il client sta effettuando il login");
+                                    // TODO IMPLEMENTARE LOGICHE CHECK
+                                    // Passare i dati decodificati alla loginData prelevando l' oggetto loginEntity
+                                    LoginEntity loginEntity = new LoginEntity();
+                                    loginEntity = loginData(decodePacket);
+                                    // Codificare il nickname e confrontarlo con quello della loginData
+                                    boolean nickCheck = checkC6Control(key, loginEntity.getNick(), loginEntity.getNickEncoded(), false);
+                                    // Codificare la password (memorizzata in futuro su redis) e confrotnarla con quella della logindata
+                                    // per il momento l'unica password accettata è "password" bisogna implementare un meccanismo di registrazione
+                                    // e di prelievo della password
+                                    boolean passCheck = checkC6Control(key, "password", loginEntity.getPassEncoded(), true);
+                                    // Se i controlli sono entrambi true andare avanti (poi dovrò gestire l errore della password sbagliata o dell'utente già connesso.
+                                    if (!nickCheck) {
+                                        System.out.println("Lo spooffing non è consetito su questo server!!! Verrai segnalato");
+                                        return;
+                                    }
+                                    if (!passCheck) {
+                                        System.out.println("Password Sbagliata!");
+                                    } else {
+                                        System.out.println("Password corretta! ... procediamo con autenticazione");
+                                    }
 
-                        InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
-                        infoLoginEntity.setCount(2);
-                        //numBanner attualmente solo uno
-                        infoLoginEntity.setGif("http://localhost/images/banner1.gif");
-                        infoLoginEntity.setLinkBanner("http://www.google.it");
-                        infoLoginEntity.setNome("banner1");
-                        infoLoginEntity.setId("1");
-                        infoLoginEntity.setLinkButton("http://www.google.it");
-                        infoLoginEntity.setDescr("JC6Server");
+                                    // TODO FARE CHCEK INFOLOGIN
 
-                        byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
+                                    InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
+                                    infoLoginEntity.setCount(2);
+                                    //numBanner attualmente solo uno
 
-                        out.write(infoLoginCmd); // invio infoLogin al server
-                        out.flush();
+                                    infoLoginEntity.setGif("http://localhost/images/banner1.gif");
+                                    infoLoginEntity.setLinkBanner("http://www.google.it");
+                                    infoLoginEntity.setNome("banner1");
+                                    infoLoginEntity.setId("1");
+                                    infoLoginEntity.setLinkButton("http://www.google.it");
+                                    infoLoginEntity.setDescr("JC6Server");
 
-                        System.out.println("INFOLOGIN:");
-                        for (byte b : infoLoginCmd) {
-                            System.out.printf("%02X ", b);
+                                    byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
+
+                                    out.write(infoLoginCmd); // invio infoLogin al server
+                                    out.flush();
+
+                                    System.out.println("INFOLOGIN:");
+                                    for (byte b : infoLoginCmd) {
+                                        System.out.printf("%02X ", b);
+                                    }
+                                    System.out.println();
+
+                                    //TODO FARE CHECK SU WELCOME MESSAGE
+                                    WelcomeEntity welcomeEntity = new WelcomeEntity();
+                                    welcomeEntity.setCount(3);
+                                    welcomeEntity.setBenvenuto("Welcome Message!");
+
+                                    byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
+
+                                    out.write(welcomeMessageCmd); // invio Welcome Message
+                                    out.flush();
+
+                                    System.out.println("Welcome Message:");
+                                    for (byte b : welcomeMessageCmd) {
+                                        System.out.printf("%02X ", b);
+                                    }
+                                    System.out.println();
+                                }
+                                if (cmdClient != C6EnumClient.LOGIN.getCode()) {
+                                    System.out.println("STANNO ARRIVANODI I DATI REQ_PLUS FUNZIONA!!!");
+                                }
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
                         }
-                        System.out.println();
-
-                        //TODO IMPLEMENTARE LA WELCOME
-                        WelcomeEntity welcomeEntity = new WelcomeEntity();
-                        welcomeEntity.setCount(3);
-                        welcomeEntity.setBenvenuto("Welcome Message!");
-
-                        byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
-
-                        out.write(welcomeMessageCmd); // invio infoLogin al server
-                        out.flush();
-
-                        System.out.println("Welcome Message:");
-                        for (byte b : welcomeMessageCmd) {
-                            System.out.printf("%02X ", b);
-                        }
-                        System.out.println();
-
-                    }
+                    }).start();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
             }
-        }
+        }).start();
     }
 
 
@@ -127,7 +154,7 @@ public class C6ServerMain {
     // Stampa nickname
     // Stampa nickname codificato
     // Stampa password codificata
-    private static LoginEntity loginData(byte [] data) {
+    private static LoginEntity loginData(byte[] data) {
         // Devo andare all undicesimo byte e prelevare la lunghezza
         // e poi devo prelevare dal dodicesimo byte più la lunghezza
 
@@ -177,7 +204,8 @@ public class C6ServerMain {
         System.arraycopy(digest, 0, pDest, 0, 16);
     }
 
-    public static byte[] codecC6(String strCode, byte[] strKeyServer, byte[] strDest, boolean psw) throws NoSuchAlgorithmException {
+    public static byte[] codecC6(String strCode, byte[] strKeyServer, byte[] strDest, boolean psw) throws
+            NoSuchAlgorithmException {
         StringBuilder tt = new StringBuilder();
 
         if (psw) {
@@ -206,7 +234,8 @@ public class C6ServerMain {
         return strDest;
     }
 
-    public static boolean checkC6Control(byte[] orderKey, String stringEncode, byte[] compareDecodeValue, boolean psw) throws NoSuchAlgorithmException {
+    public static boolean checkC6Control(byte[] orderKey, String stringEncode, byte[] compareDecodeValue,
+                                         boolean psw) throws NoSuchAlgorithmException {
         byte[] hash = new byte[16];
         codecC6(stringEncode, orderKey, hash, psw);
         return Arrays.equals(hash, compareDecodeValue);
@@ -261,10 +290,10 @@ public class C6ServerMain {
         orderKey[0] = key[0];
 
         int start = 1;
-        for (int i=1;i<key.length -1; i++) {
+        for (int i = 1; i < key.length - 1; i++) {
             int selectElement = (start + step);
 
-            if(selectElement <= 7) {
+            if (selectElement <= 7) {
                 orderKey[i] = key[selectElement - 1];
                 start = selectElement;
             } else {
@@ -285,7 +314,7 @@ public class C6ServerMain {
         // La decodifica su applica dal 7 byte in poi.
 
         // preleviamo da data dal 7 byte in poi
-        byte[] bytesDecode =  Arrays.copyOfRange(data, 0, 6);
+        byte[] bytesDecode = Arrays.copyOfRange(data, 0, 6);
         byte[] bytesEncoded = Arrays.copyOfRange(data, 6, data.length);
         List<byte[]> encodeBlock = new ArrayList<>();
         List<Byte> decodeBlock = new ArrayList<>();
@@ -295,7 +324,7 @@ public class C6ServerMain {
         System.arraycopy(orderKey, 0, xorKey, 0, 7);
 
         // Divido i byteEncoded in gruppi da 7 byte
-        for(int i=0; i < bytesEncoded.length ; i+=7 ) {
+        for (int i = 0; i < bytesEncoded.length; i += 7) {
             int end = Math.min(i + 7, bytesEncoded.length);
             int length = end - i;
             byte[] block = new byte[length];
@@ -307,9 +336,9 @@ public class C6ServerMain {
             encodeBlock.add(block);
         }
 
-        for(byte[] block:encodeBlock) {
+        for (byte[] block : encodeBlock) {
             for (int i = 0; i < block.length; i++) {
-                byte[] xorBlock = new byte [7];
+                byte[] xorBlock = new byte[7];
                 xorBlock[i] = (byte) ((block[i] & 0xFF) ^ (xorKey[i] & 0xFF)); // XOR tra i valori unsigned
 
                 // Stampiamo il risultato

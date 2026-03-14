@@ -68,8 +68,12 @@ public class InfoLoginEntity {
     }
 
     public byte[] getNumBannersBytes() {
-        // per il momento gestiamo un solo banner
-        return "1".getBytes(StandardCharsets.UTF_8);
+        int numBanners = 1; // per il momento solo uno
+
+        byte[] value = new byte[1];
+        value[0] = (byte) numBanners;
+
+        return value;
     }
 
     public byte[] getCount() {

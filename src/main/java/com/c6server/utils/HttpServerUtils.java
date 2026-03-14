@@ -39,7 +39,7 @@ public class HttpServerUtils {
 
                 server.setExecutor(null);
                 server.start();
-                System.out.println("HTTP Server avviato su http://localhost:8080/images");
+                System.out.println("HTTP Server avviato su http://localhost:80/images");
 
             } catch (IOException e) {
                 System.err.println("Errore nell'avvio del server: " + e.getMessage());
