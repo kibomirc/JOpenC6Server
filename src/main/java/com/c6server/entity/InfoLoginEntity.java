@@ -89,40 +89,30 @@ public class InfoLoginEntity {
     }
 
     public byte[] getLengthWithGif() {
-
         int lenGif = gif.length();
-        byte[] lenGifBytes = new byte[2];
-        lenGifBytes[0] = (byte) ((lenGif >> 8) & 0xFF);
-        lenGifBytes[1] = (byte) (lenGif & 0xFF);
+        byte lenGifByte = (byte) (lenGif & 0xFF);
 
         byte[] gifBytes = gif.getBytes(StandardCharsets.UTF_8);
 
-        return concatBytes(lenGifBytes,gifBytes);
+        return concatBytes(new byte[]{lenGifByte}, gifBytes);
     }
 
     public byte[] getLengthWithLinkBanner() {
-
         int lenLinkBanner = linkButton.length();
-        byte[] lenLinkBannerBytes = new byte[2];
-        lenLinkBannerBytes[0] = (byte) ((lenLinkBanner >> 8) & 0xFF);
-        lenLinkBannerBytes[1] = (byte) (lenLinkBanner & 0xFF);
+        byte lenLinkBannerByte = (byte) (lenLinkBanner & 0xFF);
 
         byte[] linkBannerBytes = linkBanner.getBytes(StandardCharsets.UTF_8);
 
-        return concatBytes(lenLinkBannerBytes,linkBannerBytes);
+        return concatBytes(new byte[]{lenLinkBannerByte}, linkBannerBytes);
     }
 
     public byte[] getLengthWithName() {
-
         int lenNome = nome.length();
-        byte[] lenNomeBytes = new byte[2];
-        lenNomeBytes[0] = (byte) ((lenNome >> 8) & 0xFF);
-        lenNomeBytes[1] = (byte) (lenNome & 0xFF);
-
+        byte lenNomeByte = (byte) (lenNome & 0xFF);
 
         byte[] linkBannerBytes = linkBanner.getBytes(StandardCharsets.UTF_8);
 
-        return concatBytes(lenNomeBytes,linkBannerBytes);
+        return concatBytes(new byte[]{lenNomeByte}, linkBannerBytes);
     }
 
     public byte[] getNumeroPulsanti() {
@@ -130,7 +120,7 @@ public class InfoLoginEntity {
         return "1".getBytes(StandardCharsets.UTF_8);
     }
 
-    public byte[] getId(String id) {
+    public byte[] getButtonId(String id) {
         int idNum = Integer.parseInt(id);
 
         byte[] value = new byte[1];
@@ -142,44 +132,44 @@ public class InfoLoginEntity {
 
     public byte[] getLengthWithLinkButton() {
 
-        int lenLinkButton = linkButton.length();
-        byte[] lenLinkButtonBytes = new byte[2];
-        lenLinkButtonBytes[0] = (byte) ((lenLinkButton >> 8) & 0xFF);
-        lenLinkButtonBytes[1] = (byte) (lenLinkButton & 0xFF);
-
         byte[] linkButtonBytes = linkButton.getBytes(StandardCharsets.UTF_8);
+        int lenLinkButton = linkButtonBytes.length;
 
-        return concatBytes(lenLinkButtonBytes,linkButtonBytes);
+        byte lenLinkButtonByte = (byte) lenLinkButton;
+
+        return concatBytes(new byte[]{lenLinkButtonByte}, linkButtonBytes);
     }
 
     public byte[] getLengthWithDescr() {
 
 
-        int lenDescr = descr.length();
-        byte[] lenDescrBytes = new byte[2];
-        lenDescrBytes[0] = (byte) ((lenDescr >> 8) & 0xFF);
-        lenDescrBytes[1] = (byte) (lenDescr & 0xFF);
-
         byte[] descrBytes = descr.getBytes(StandardCharsets.UTF_8);
+        int lenDescr = descrBytes.length;
 
-        return concatBytes(lenDescrBytes,descrBytes);
+        byte lenDescrByte = (byte) lenDescr;
+
+        return concatBytes(new byte[]{lenDescrByte}, descrBytes);
     }
 
     public byte[] getLength() {
 
         int unknownBytes = 11;
         int lenNumBanner = getNumBannersBytes().length; // numBanners
-        int lenGif = getLengthWithGif().length; // lenGif + Gif
-        int lenBanner = getLengthWithLinkBanner().length; // LenLinkBanner + LinkBanner
-        int lenName = getLengthWithName().length; // lenNome + nome
-        int lenButton = getNumeroPulsanti().length; // numPulsanti
-        int lenId = getId(id).length; // Id
+        int lenGif = getLengthWithGif().length;         // lenGif + Gif
+        int lenBanner = getLengthWithLinkBanner().length; // lenLinkBanner + LinkBanner
+        int lenName = getLengthWithName().length;      // lenNome + nome
+        int lenButton = getNumeroPulsanti().length;    // numPulsanti
+        int lenId = getButtonId(id).length;            // Id
         int lenLink = getLengthWithLinkButton().length; // lenLinkButton + linkButton
-        int lenDescr = getLengthWithDescr().length; // LenDescr + Descr
+        int lenDescr = getLengthWithDescr().length;    // lenDescr + Descr
 
         int totalLen = unknownBytes + lenNumBanner + lenGif + lenBanner + lenName + lenButton + lenId + lenLink + lenDescr;
 
-        return new byte[] { (byte) (totalLen & 0xFF) };
+        byte[] totalLenBytes = new byte[2];
+        totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
+        totalLenBytes[1] = (byte) (totalLen & 0xFF);
+
+        return totalLenBytes;
     }
 
     public byte[] getInfoLogin() throws IOException {
@@ -194,7 +184,7 @@ public class InfoLoginEntity {
         infoLoginComposit.write(getLengthWithName());
         infoLoginComposit.write(getNumeroPulsanti());
         infoLoginComposit.write(UNKNOWBYTE_2);
-        infoLoginComposit.write(getId("1"));
+        infoLoginComposit.write(getButtonId("1"));
         infoLoginComposit.write(getLengthWithLinkButton());
         infoLoginComposit.write(getLengthWithDescr());
         infoLoginComposit.write(UNKNOWBYTE_3);

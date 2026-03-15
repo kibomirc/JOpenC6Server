@@ -33,15 +33,12 @@ public class WelcomeEntity {
     }
 
     public byte[] getLengthWithBenvenuto() {
-          //TODO cambiare tutte le logiche anche alla infoLoginEntity
-        int length = benvenuto.length();
-        byte[] lenBenvenutoBytes = new byte[2];
-        lenBenvenutoBytes[0] = (byte) ((length >> 8) & 0xFF); // TODO deve essere convertito in big endiamo non deve essere 12 00 ma 00 12
-        lenBenvenutoBytes[1] = (byte) (length & 0xFF);
-
         byte[] benvenutoBytes = benvenuto.getBytes(StandardCharsets.UTF_8);
+        int lenBenvenuto = benvenutoBytes.length;
 
-        return concatBytes(lenBenvenutoBytes,benvenutoBytes);
+        byte lenBenvenutoByte = (byte) lenBenvenuto;
+
+        return concatBytes(new byte[]{lenBenvenutoByte}, benvenutoBytes);
     }
 
     public byte[] getLength() {

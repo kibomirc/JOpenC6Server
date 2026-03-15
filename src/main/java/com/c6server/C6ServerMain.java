@@ -99,10 +99,10 @@ public class C6ServerMain {
                                     //numBanner attualmente solo uno
 
                                     infoLoginEntity.setGif("http://localhost/images/banner1.gif");
-                                    infoLoginEntity.setLinkBanner("http://www.google.it");
+                                    infoLoginEntity.setLinkBanner("http://www.google.com");
                                     infoLoginEntity.setNome("banner1");
                                     infoLoginEntity.setId("1");
-                                    infoLoginEntity.setLinkButton("http://www.google.it");
+                                    infoLoginEntity.setLinkButton("http://www.google.com");
                                     infoLoginEntity.setDescr("JC6Server");
 
                                     byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
@@ -114,12 +114,13 @@ public class C6ServerMain {
                                     for (byte b : infoLoginCmd) {
                                         System.out.printf("%02X ", b);
                                     }
+
                                     System.out.println();
 
                                     //TODO FARE CHECK SU WELCOME MESSAGE
                                     WelcomeEntity welcomeEntity = new WelcomeEntity();
                                     welcomeEntity.setCount(3);
-                                    welcomeEntity.setBenvenuto("Welcome Message!");
+                                    welcomeEntity.setBenvenuto("Benvenuto");
 
                                     byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
 
