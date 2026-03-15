@@ -98,16 +98,29 @@ public class C6ServerMain {
                                     infoLoginEntity.setCount(2);
                                     //numBanner attualmente solo uno
 
-                                    infoLoginEntity.setGif("http://localhost/images/banner1.gif");
-                                    infoLoginEntity.setLinkBanner("http://www.google.com");
-                                    infoLoginEntity.setNome("banner1");
+                                    infoLoginEntity.setGif("http://static.c6online.it/banner/advert-00.gif");
+                                    infoLoginEntity.setLinkBanner("https://www.c6online.it");
+                                    infoLoginEntity.setNome("banner");
                                     infoLoginEntity.setId("1");
-                                    infoLoginEntity.setLinkButton("http://www.google.com");
+                                    infoLoginEntity.setLinkButton("https://www.c6online.it");
                                     infoLoginEntity.setDescr("JC6Server");
 
-                                    byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
+                                    System.out.println();
 
-                                    out.write(infoLoginCmd); // invio infoLogin al server
+                                    //TODO FARE CHECK SU WELCOME MESSAGE
+                                    WelcomeEntity welcomeEntity = new WelcomeEntity();
+                                    welcomeEntity.setCount(3);
+                                    welcomeEntity.setBenvenuto("Benvenuto");
+
+
+                                    byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
+                                    byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
+
+                                    ByteArrayOutputStream infoLoginAndMotd = new ByteArrayOutputStream();
+                                    infoLoginAndMotd.write(infoLoginCmd);
+                                    infoLoginAndMotd.write(welcomeMessageCmd);
+
+                                    out.write(infoLoginAndMotd.toByteArray());
                                     out.flush();
 
                                     System.out.println("INFOLOGIN:");
@@ -117,21 +130,12 @@ public class C6ServerMain {
 
                                     System.out.println();
 
-                                    //TODO FARE CHECK SU WELCOME MESSAGE
-                                    WelcomeEntity welcomeEntity = new WelcomeEntity();
-                                    welcomeEntity.setCount(3);
-                                    welcomeEntity.setBenvenuto("Benvenuto");
-
-                                    byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
-
-                                    out.write(welcomeMessageCmd); // invio Welcome Message
-                                    out.flush();
 
                                     System.out.println("Welcome Message:");
                                     for (byte b : welcomeMessageCmd) {
                                         System.out.printf("%02X ", b);
                                     }
-                                    System.out.println();
+
                                 }
                                 if (cmdClient != C6EnumClient.LOGIN.getCode()) {
                                     System.out.println("STANNO ARRIVANODI I DATI REQ_PLUS FUNZIONA!!!");

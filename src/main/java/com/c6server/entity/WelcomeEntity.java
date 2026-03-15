@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 public class WelcomeEntity {
     private final byte[] SERVER_COMMAND = new byte[] {0x20, 0x10};
+    private final byte[] UNKNOWBYTE_1 = new byte[] {0x00};
 
     private Integer count;
     String lenBenvenuto;
@@ -42,7 +43,7 @@ public class WelcomeEntity {
     }
 
     public byte[] getLength() {
-        int lenBenvenuto = getLengthWithBenvenuto().length; // lunghezza totale
+        int lenBenvenuto = getLengthWithBenvenuto().length + UNKNOWBYTE_1.length;
 
         return new byte[] {
                 (byte) ((lenBenvenuto >> 8) & 0xFF),  // byte alto (più significativo)
@@ -55,6 +56,7 @@ public class WelcomeEntity {
         wmComposit.write(SERVER_COMMAND);
         wmComposit.write(getCount());
         wmComposit.write(getLength());
+        wmComposit.write(UNKNOWBYTE_1);
         wmComposit.write(getLengthWithBenvenuto());
 
         byte[] infoLogin = wmComposit.toByteArray();
