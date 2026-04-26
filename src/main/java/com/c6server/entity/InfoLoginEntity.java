@@ -9,7 +9,7 @@ public class InfoLoginEntity {
     private final byte[] SERVER_COMMAND = new byte[] {0x20, 0x01};
     private final byte[] UNKNOWBYTE_1 = new byte[] {0x00, 0x00, 0x00, 0x01};
     private final byte[] UNKNOWBYTE_2 = new byte[] {0x00, 0x5A, 0x01};
-    private final byte[] UNKNOWBYTE_3 = new byte[] {0x00, 0x00, 0x00 ,0x14};
+    private final byte[] UNKNOWBYTE_3 = new byte[] {0x00, 0x00 ,0x14}; // nuova documentazione levato un 00 iniziale
 
     private Integer count;
     private String numBanners;
@@ -110,7 +110,7 @@ public class InfoLoginEntity {
         int lenNome = nome.length();
         byte lenNomeByte = (byte) (lenNome & 0xFF);
 
-        byte[] linkBannerBytes = linkBanner.getBytes(StandardCharsets.UTF_8);
+        byte[] linkBannerBytes = nome.getBytes(StandardCharsets.UTF_8);
 
         return concatBytes(new byte[]{lenNomeByte}, linkBannerBytes);
     }
@@ -120,13 +120,20 @@ public class InfoLoginEntity {
         return "1".getBytes(StandardCharsets.UTF_8);
     }
 
-    public byte[] getButtonId(String id) {
+    public byte[] getButtonLinkId(String id) {
         int idNum = Integer.parseInt(id);
 
         byte[] value = new byte[1];
         // 48 (ASCII di '0') + 1 = 49 (che è 0x31 in esadecimale)
-        value[0] = (byte) (48 + idNum);
+        value[0] = (byte) (48); // + idNum
 
+        return value;
+    }
+
+    public byte[] getBtnId() {
+        int idNum = Integer.parseInt("56");
+        byte[] value = new byte[1];
+        value[0] = (byte) (idNum);
         return value;
     }
 
@@ -153,17 +160,18 @@ public class InfoLoginEntity {
 
     public byte[] getLength() {
 
-        int unknownBytes = 11;
+        int unknownBytes = 10;
         int lenNumBanner = getNumBannersBytes().length; // numBanners
         int lenGif = getLengthWithGif().length;         // lenGif + Gif
         int lenBanner = getLengthWithLinkBanner().length; // lenLinkBanner + LinkBanner
         int lenName = getLengthWithName().length;      // lenNome + nome
+        int lenBtnId = getBtnId().length; // getBtnId (documentazione nuova)
         int lenButton = getNumeroPulsanti().length;    // numPulsanti
-        int lenId = getButtonId(id).length;            // Id
+        int lenButtonLinkId = getButtonLinkId(id).length; // Id
         int lenLink = getLengthWithLinkButton().length; // lenLinkButton + linkButton
         int lenDescr = getLengthWithDescr().length;    // lenDescr + Descr
 
-        int totalLen = unknownBytes + lenNumBanner + lenGif + lenBanner + lenName + lenButton + lenId + lenLink + lenDescr;
+        int totalLen = unknownBytes + lenNumBanner + lenGif + lenBanner + lenName + lenButton + lenBtnId + lenButtonLinkId + lenLink + lenDescr;
 
         byte[] totalLenBytes = new byte[2];
         totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
@@ -184,12 +192,32 @@ public class InfoLoginEntity {
         infoLoginComposit.write(getLengthWithName());
         infoLoginComposit.write(getNumeroPulsanti());
         infoLoginComposit.write(UNKNOWBYTE_2);
-        infoLoginComposit.write(getButtonId("1"));
+        infoLoginComposit.write(getBtnId());
+        infoLoginComposit.write(getButtonLinkId("1"));
         infoLoginComposit.write(getLengthWithLinkButton());
         infoLoginComposit.write(getLengthWithDescr());
         infoLoginComposit.write(UNKNOWBYTE_3);
 
         byte[] infoLogin = infoLoginComposit.toByteArray();
+
+        System.out.println("LOG PACCHETTO COMPLETO:");
+        System.out.println("Server Command: " + java.util.HexFormat.ofDelimiter(" ").formatHex(SERVER_COMMAND));
+        System.out.println("Command Count: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getCount()));
+        System.out.println("Length (Total): " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLength()));
+        System.out.println("Unknown Byte 1: " + java.util.HexFormat.ofDelimiter(" ").formatHex(UNKNOWBYTE_1));
+        System.out.println("Num Banners: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getNumBannersBytes()));
+        System.out.println("Gif URL Path (3C): " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithGif()));
+        System.out.println("Banner Link: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithLinkBanner()));
+        System.out.println("Banner Name: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithName())); // todo problema qui
+        System.out.println("Numero Pulsanti: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getNumeroPulsanti()));
+        System.out.println("Unknown Byte 2: " + java.util.HexFormat.ofDelimiter(" ").formatHex(UNKNOWBYTE_2));
+        System.out.println("Button ID: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getBtnId()));
+        System.out.println("Button Link ID: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getButtonLinkId("1")));
+        System.out.println("Button Link URL: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithLinkButton()));
+        System.out.println("Server Descr: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithDescr()));
+        System.out.println("Unknown Byte 3: " + java.util.HexFormat.ofDelimiter(" ").formatHex(UNKNOWBYTE_3));
+
+
 
         return infoLogin;
     }

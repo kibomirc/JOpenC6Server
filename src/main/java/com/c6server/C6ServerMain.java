@@ -98,29 +98,32 @@ public class C6ServerMain {
                                     infoLoginEntity.setCount(2);
                                     //numBanner attualmente solo uno
 
-                                    infoLoginEntity.setGif("http://static.c6online.it/banner/advert-00.gif");
+
+                                    //Gif
+                                    infoLoginEntity.setGif("https://static.c6online.it/banner/advert-00.gif?t=1777228815");
+
+                                    //Link
                                     infoLoginEntity.setLinkBanner("https://www.c6online.it");
-                                    infoLoginEntity.setNome("banner");
+                                    infoLoginEntity.setNome("Banner 123");
+
+                                    //Button
                                     infoLoginEntity.setId("1");
                                     infoLoginEntity.setLinkButton("https://www.c6online.it");
                                     infoLoginEntity.setDescr("JC6Server");
 
+                                    byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
+
+                                    out.write(infoLoginCmd); // invio infoLogin al server
+                                    out.flush();
                                     System.out.println();
 
                                     //TODO FARE CHECK SU WELCOME MESSAGE
                                     WelcomeEntity welcomeEntity = new WelcomeEntity();
                                     welcomeEntity.setCount(3);
-                                    welcomeEntity.setBenvenuto("Benvenuto");
+                                    welcomeEntity.setBenvenuto("Benvenuto. In italia sono le 23 meno 4 di Mercoledi 25 Giugno 2025. C6 in questo momento collega 14 utenti");
 
-
-                                    byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
                                     byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
-
-                                    ByteArrayOutputStream infoLoginAndMotd = new ByteArrayOutputStream();
-                                    infoLoginAndMotd.write(infoLoginCmd);
-                                    infoLoginAndMotd.write(welcomeMessageCmd);
-
-                                    out.write(infoLoginAndMotd.toByteArray());
+                                    out.write(infoLoginCmd); // invio infoLogin al server
                                     out.flush();
 
                                     System.out.println("INFOLOGIN:");
