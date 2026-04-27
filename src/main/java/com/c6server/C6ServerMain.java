@@ -113,18 +113,24 @@ public class C6ServerMain {
 
                                     byte[] infoLoginCmd = infoLoginEntity.getInfoLogin();
 
-                                    out.write(infoLoginCmd); // invio infoLogin al server
-                                    out.flush();
+                                    //out.write(infoLoginCmd); // invio infoLogin al server
+                                    //out.flush();
                                     System.out.println();
 
                                     //TODO FARE CHECK SU WELCOME MESSAGE
                                     WelcomeEntity welcomeEntity = new WelcomeEntity();
                                     welcomeEntity.setCount(3);
-                                    welcomeEntity.setBenvenuto("Benvenuto. In italia sono le 23 meno 4 di Mercoledi 25 Giugno 2025. C6 in questo momento collega 14 utenti");
+                                    welcomeEntity.setBenvenuto("Benvenuto. In italia sono ... É l'ora della nostaliga!");
 
                                     byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
-                                    out.write(infoLoginCmd); // invio infoLogin al server
-                                    out.flush();
+                                    //out.write(infoLoginCmd); // invio infoLogin al server
+                                    //out.flush();
+
+                                    ByteArrayOutputStream infoLoginAndMotd = new ByteArrayOutputStream();
+                                    infoLoginAndMotd.write(infoLoginCmd);
+                                    infoLoginAndMotd.write(welcomeMessageCmd);
+
+                                    out.write(infoLoginAndMotd.toByteArray());
 
                                     System.out.println("INFOLOGIN:");
                                     for (byte b : infoLoginCmd) {
