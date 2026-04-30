@@ -98,7 +98,7 @@ public class InfoLoginEntity {
     }
 
     public byte[] getLengthWithLinkBanner() {
-        int lenLinkBanner = linkButton.length();
+        int lenLinkBanner = linkBanner.length();
         byte lenLinkBannerByte = (byte) (lenLinkBanner & 0xFF);
 
         byte[] linkBannerBytes = linkBanner.getBytes(StandardCharsets.UTF_8);

@@ -100,12 +100,11 @@ public class C6ServerMain {
 
 
                                     //Gif
-                                    infoLoginEntity.setGif("https://static.c6online.it/banner/advert-00.gif?t=1777228815");
-
+                                    //infoLoginEntity.setGif("https://static.c6online.it/banner/advert-00.gif?t=1777228815");
+                                    infoLoginEntity.setGif("http://localhost:80/images/banner1.gif");
                                     //Link
-                                    infoLoginEntity.setLinkBanner("https://www.c6online.it");
+                                    infoLoginEntity.setLinkBanner("http://localhost:80/welcome");
                                     infoLoginEntity.setNome("Banner 123");
-
                                     //Button
                                     infoLoginEntity.setId("1");
                                     infoLoginEntity.setLinkButton("https://www.c6online.it");
@@ -120,7 +119,7 @@ public class C6ServerMain {
                                     //TODO FARE CHECK SU WELCOME MESSAGE
                                     WelcomeEntity welcomeEntity = new WelcomeEntity();
                                     welcomeEntity.setCount(3);
-                                    welcomeEntity.setBenvenuto("Benvenuto. In italia sono ... É l'ora della nostaliga!");
+                                    welcomeEntity.setBenvenuto("Benvenuto. In italia sono ... non importa, goditi il momento!");
 
                                     byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
                                     //out.write(infoLoginCmd); // invio infoLogin al server
