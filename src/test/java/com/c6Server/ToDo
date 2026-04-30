@@ -6,7 +6,9 @@ infoLogin con welcome mesagge (ok)
 
 vedere se si prende il banner da server in locale e non da OpenC6Online (ok)
 
-implementare req-plus
+gestire nell' if la cattura di req-plus (ok)
+
+implementare la SendPlusEntity (in progress)
 
 sistemare i test unitari
 

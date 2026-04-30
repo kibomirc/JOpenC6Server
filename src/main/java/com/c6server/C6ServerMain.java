@@ -145,8 +145,9 @@ public class C6ServerMain {
                                     }
 
                                 }
-                                if (cmdClient != C6EnumClient.LOGIN.getCode()) {
-                                    System.out.println("STANNO ARRIVANODI I DATI REQ_PLUS FUNZIONA!!!");
+                                if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
+                                    System.out.println("Intercetto REQ_PLUS!");
+                                    // Devo inviare SND_PULS
                                 }
                             }
                         } catch (IOException e) {
