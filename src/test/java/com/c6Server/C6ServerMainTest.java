@@ -3,6 +3,7 @@ package com.c6Server;
 import com.c6server.C6ServerMain;
 import com.c6server.entity.InfoLoginEntity;
 import com.c6server.entity.LoginEntity;
+import com.c6server.entity.SendPulsEntity;
 import com.c6server.entity.WelcomeEntity;
 import org.junit.jupiter.api.Test;
 
@@ -155,6 +156,24 @@ public class C6ServerMainTest
 
         System.out.println("Welcome Message:");
         for (byte b : welcomeMessageCmd) {
+            System.out.printf("%02X ", b);
+        }
+        System.out.println();
+    }
+
+    @Test
+    void testSendPuls() throws IOException {
+        SendPulsEntity sendPulsEntity = new SendPulsEntity();
+        sendPulsEntity.setCount(3);
+        sendPulsEntity.setNumPuls(1);
+        sendPulsEntity.setDescr("Descrizione sendPuls");
+        sendPulsEntity.setLink("http://localhost:80/sndPuls");
+
+
+        byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
+
+        System.out.println("SND_PULS:");
+        for (byte b : sendPulsCmd) {
             System.out.printf("%02X ", b);
         }
         System.out.println();
