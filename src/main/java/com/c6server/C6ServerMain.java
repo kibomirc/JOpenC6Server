@@ -7,6 +7,7 @@ import com.c6server.entity.LoginEntity;
 import com.c6server.entity.SendPulsEntity;
 import com.c6server.entity.WelcomeEntity;
 import com.c6server.utils.HttpServerUtils;
+import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -146,7 +147,7 @@ public class C6ServerMain {
                                     }
 
                                 }
-                                if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
+                                if (cmdClient == C6EnumClient.REQ_PULS.getCode()) { // req_puls e req_user mi arrivano insieme!!! il protcollo è sbagliato!
                                     System.out.println("Intercetto REQ_PLUS!");
 
                                     SendPulsEntity sendPulsEntity = new SendPulsEntity();
@@ -160,14 +161,34 @@ public class C6ServerMain {
                                     sendPulsEntity.addButton("Virgilio", "https://www.virgilio.it/");
 
 
+
                                     byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
 
+
+
+                                    // estrapolo req_user
+                                    if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decodePacket)) {
+
+                                        List<String> netFriend = UtilsProtocol.getReqUsersOnLogin(decodePacket);
+
+                                        System.out.println("Vediamo se funziona: " + netFriend);
+                                    }
+
+
+                                    // provare ad inviare SND_PULS concatenato a SND_USERS
                                     System.out.println("SND_PULS:");
                                     for (byte b : sendPulsCmd) {
                                         System.out.printf("%02X ", b);
                                     }
                                     System.out.println();
+
                                 }
+
+                                // in caso si aggiungesse un nuovo netfriend scatta il comando 03 , come da documentazione
+                                if (cmdClient == C6EnumClient.REQ_USERS.getCode()) {
+                                    System.out.println("aggiunto nuovo netfriend");
+                                }
+
                             }
                         } catch (IOException e) {
                             e.printStackTrace();

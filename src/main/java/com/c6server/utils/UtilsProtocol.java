@@ -1,6 +1,8 @@
 package com.c6server.utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UtilsProtocol {
 
@@ -15,5 +17,29 @@ public class UtilsProtocol {
         byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
         byte lenByte = (byte) textBytes.length;
         return concatBytes(new byte[]{lenByte}, textBytes);
+    }
+
+
+// TODO to be implemented
+    public static List<String> getReqUsers(byte[] decodePacket) {
+        List<String> netFriends = new ArrayList<>();
+
+
+        return netFriends;
+    }
+
+// TODO to be implemented
+    public static List<String> getReqUsersOnLogin(byte[] decodePacket) {
+        List<String> netFriends = new ArrayList<>();
+
+        return netFriends;
+    }
+
+    public static byte extractCmdReqUserOnLogin(byte[] data) {
+        if (data.length < 8) {
+            throw new IllegalArgumentException("Pacchetto troppo corto: servono almeno 8 byte");
+        }
+
+        return data[21];
     }
 }

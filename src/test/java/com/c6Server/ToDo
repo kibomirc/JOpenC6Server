@@ -8,7 +8,11 @@ vedere se si prende il banner da server in locale e non da OpenC6Online (ok)
 
 gestire nell' if la cattura di req-plus (ok)
 
-implementare la SendPlusEntity (in progress)
+implementare la SendPlusEntity (ok , i pulsanti saranno visibili successivamente)
+
+implementare la SendUsers ( per completarla serve l'integrazione con sqllite e memorizzare i dati all' avvio in più va gestito anche il ping e la disconnessione)
+quindi attualmente sarà un mock e simuliamo che un utente con il nick di BigAlex sia sempre connesso!
+
 
 sistemare i test unitari
 
