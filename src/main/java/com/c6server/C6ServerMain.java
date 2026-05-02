@@ -150,13 +150,14 @@ public class C6ServerMain {
                                     System.out.println("Intercetto REQ_PLUS!");
 
                                     SendPulsEntity sendPulsEntity = new SendPulsEntity();
-                                    sendPulsEntity.setCount(3);
-                                    sendPulsEntity.setNumPuls(4);
+                                    sendPulsEntity.setCount(0);
+                                    sendPulsEntity.setNumPuls(5);
 
-                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
-                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
-                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
-                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
+                                    sendPulsEntity.addButton("C6Online", "https://www.c6online.it");
+                                    sendPulsEntity.addButton("OpenC6", "https://web.archive.org/web/20040722065013/http://openc6.extracon.it/index.php");
+                                    sendPulsEntity.addButton("Icona", "https://www.icona.it/");
+                                    sendPulsEntity.addButton("Alice", "https://www.tim.it/");
+                                    sendPulsEntity.addButton("Virgilio", "https://www.virgilio.it/");
 
 
                                     byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
