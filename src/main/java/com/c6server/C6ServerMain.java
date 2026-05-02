@@ -4,6 +4,7 @@ import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumServer;
 import com.c6server.entity.InfoLoginEntity;
 import com.c6server.entity.LoginEntity;
+import com.c6server.entity.SendPulsEntity;
 import com.c6server.entity.WelcomeEntity;
 import com.c6server.utils.HttpServerUtils;
 import org.apache.logging.log4j.LogManager;
@@ -147,7 +148,24 @@ public class C6ServerMain {
                                 }
                                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
                                     System.out.println("Intercetto REQ_PLUS!");
-                                    // Devo inviare SND_PULS
+
+                                    SendPulsEntity sendPulsEntity = new SendPulsEntity();
+                                    sendPulsEntity.setCount(3);
+                                    sendPulsEntity.setNumPuls(4);
+
+                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
+                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
+                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
+                                    sendPulsEntity.addButton("https://www.c6online.it", "C6Online.it");
+
+
+                                    byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
+
+                                    System.out.println("SND_PULS:");
+                                    for (byte b : sendPulsCmd) {
+                                        System.out.printf("%02X ", b);
+                                    }
+                                    System.out.println();
                                 }
                             }
                         } catch (IOException e) {
