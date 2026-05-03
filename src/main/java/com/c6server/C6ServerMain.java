@@ -148,7 +148,6 @@ public class C6ServerMain {
 
                                 }
                                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) { // req_puls e req_user mi arrivano insieme!!! il protcollo è sbagliato!
-                                    System.out.println("Intercetto REQ_PLUS!");
 
                                     SendPulsEntity sendPulsEntity = new SendPulsEntity();
                                     sendPulsEntity.setCount(0);
