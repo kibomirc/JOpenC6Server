@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UtilsProtocol {
 
-    private static Integer INIT_NICK_LIST = 12;
+    private final static Integer INIT_NICK_LIST = 12;
 
     public static byte[] concatBytes(byte[] len, byte[] bytes) {
         byte[] result = new byte[len.length + bytes.length];
@@ -23,7 +23,7 @@ public class UtilsProtocol {
     }
 
 
-// TODO to be implemented
+
     public static List<String> getReqUsers(byte[] decodePacket) {
         // 10 0F 00 06 00 10 10 03 00 06 00 0A 00 01 07 62 69 67 61 6C 65 78 (in tuo onore xD)
         List<String> netFriends = new ArrayList<>();
@@ -35,7 +35,7 @@ public class UtilsProtocol {
             int lenNick = getNickLength(netFriends,decodePacket);
             StringBuilder nick = new StringBuilder();
             for(int inick=0; inick < lenNick; inick++) {
-                char cnick = (char) decodePacket[getPosNick(netFriends,decodePacket) + inick];
+                char cnick = (char) decodePacket[getPosNick(netFriends) + inick];
                 nick.append(cnick);
             }
             netFriends.add(String.valueOf(nick));
@@ -48,7 +48,7 @@ public class UtilsProtocol {
 
 
     private static Integer getNickLength(List<String> netFriends, byte[] decodePacket) {
-        int lenNick = 0;
+        int lenNick;
 
         Integer sumNick = netFriends.stream()
                 .mapToInt(String::length)
@@ -63,14 +63,13 @@ public class UtilsProtocol {
         return lenNick;
     }
 
-    private static Integer getPosNick(List<String> netFriends, byte[] decodePacket) {
+    private static Integer getPosNick(List<String> netFriends) {
 
         Integer sumNick = netFriends.stream()
                 .mapToInt(String::length)
                 .sum();
-        Integer iNick = INIT_NICK_LIST + sumNick + netFriends.size() + 2;
 
-       return iNick;
+        return INIT_NICK_LIST + sumNick + netFriends.size() + 2;
     }
 
     public static List<String> getReqUsersOnLogin(byte[] decodePacket) {
