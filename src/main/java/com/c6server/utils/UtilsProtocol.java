@@ -86,6 +86,7 @@ public class UtilsProtocol {
             throw new IllegalArgumentException("Pacchetto troppo corto: servono almeno 8 byte");
         }
 
+        if(data.length < 21) { return 0; }
         return data[21];
     }
 }

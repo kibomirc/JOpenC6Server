@@ -147,7 +147,7 @@ public class C6ServerMain {
                                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) { // req_puls e req_user mi arrivano insieme!!! il protcollo è sbagliato!
 
                                     SendPulsEntity sendPulsEntity = new SendPulsEntity();
-                                    sendPulsEntity.setCount(0);
+                                    sendPulsEntity.setCount(4);
                                     sendPulsEntity.setNumPuls(5);
 
                                     sendPulsEntity.addButton("C6Online", "https://www.c6online.it");
@@ -159,8 +159,8 @@ public class C6ServerMain {
 
 
                                     byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
-                                    out.write(sendPulsCmd);
-                                    out.flush();
+                                    //out.write(sendPulsCmd);
+                                    //out.flush();
 
 
                                     // estrapolo req_user
@@ -200,8 +200,24 @@ public class C6ServerMain {
                                 }
 
                                 // in caso si aggiungesse un nuovo netfriend scatta il comando 03 , come da documentazione
+                                // a volte entra direttamente qui altre volte sopra ( è un errore del client che ha un comportamento non deterministico)
                                 if (cmdClient == C6EnumClient.REQ_USERS.getCode()) {
-                                    System.out.println("aggiunto nuovo netfriend");
+                                    List<String> netFriends = UtilsProtocol.getReqUsers(decodePacket);
+
+                                    System.out.println("Vediamo se funziona: " + netFriends);
+
+                                    // invio utenti online:
+                                    // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
+
+                                    List<String> netFriendsOnline = List.of("bigalex","daxweb"); // lista mokkata
+                                    SendUsersEntity sendUsersEntity = new SendUsersEntity();
+
+                                    sendUsersEntity.setCount(5);
+                                    for(String netFriendOnline: netFriendsOnline) {
+                                        sendUsersEntity.addNetFriend(netFriendOnline);
+                                    }
+
+                                    byte[] sendUsersCmd = sendUsersEntity.getSndUsers();
                                 }
 
                             }
