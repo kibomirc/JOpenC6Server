@@ -2,10 +2,7 @@ package com.c6server;
 
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumServer;
-import com.c6server.entity.InfoLoginEntity;
-import com.c6server.entity.LoginEntity;
-import com.c6server.entity.SendPulsEntity;
-import com.c6server.entity.WelcomeEntity;
+import com.c6server.entity.*;
 import com.c6server.utils.HttpServerUtils;
 import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
@@ -162,15 +159,34 @@ public class C6ServerMain {
 
 
                                     byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
-
+                                    out.write(sendPulsCmd);
+                                    out.flush();
 
 
                                     // estrapolo req_user
                                     if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decodePacket)) {
 
-                                        List<String> netFriend = UtilsProtocol.getReqUsersOnLogin(decodePacket);
+                                        List<String> netFriends = UtilsProtocol.getReqUsersOnLogin(decodePacket);
 
-                                        System.out.println("Vediamo se funziona: " + netFriend);
+                                        System.out.println("Vediamo se funziona: " + netFriends);
+
+                                        // invio utenti online:
+                                        // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
+
+                                        List<String> netFriendsOnline = List.of("bigalex","daxweb"); // lista mokkata
+                                        SendUsersEntity sendUsersEntity = new SendUsersEntity();
+
+                                        sendUsersEntity.setCount(5);
+                                        for(String netFriendOnline: netFriendsOnline) {
+                                            sendUsersEntity.addNetFriend(netFriendOnline);
+                                        }
+
+                                        byte[] sendUsersCmd = sendUsersEntity.getSndUsers();
+
+                                        //out.write(sendUsersCmd);
+                                        //out.flush();
+
+
                                     }
 
 
