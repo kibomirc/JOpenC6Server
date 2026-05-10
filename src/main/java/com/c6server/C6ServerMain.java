@@ -144,7 +144,7 @@ public class C6ServerMain {
                                     }
 
                                 }
-                                if (cmdClient == C6EnumClient.REQ_PULS.getCode()) { // req_puls e req_user mi arrivano insieme!!! il protcollo è sbagliato!
+                                if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
 
                                     SendPulsEntity sendPulsEntity = new SendPulsEntity();
                                     sendPulsEntity.setCount(4);
@@ -159,11 +159,12 @@ public class C6ServerMain {
 
 
                                     byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
-                                    //out.write(sendPulsCmd);
-                                    //out.flush();
+                                    out.write(sendPulsCmd);
+                                    out.flush();
 
 
                                     // estrapolo req_user
+
                                     if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decodePacket)) {
 
                                         List<String> netFriends = UtilsProtocol.getReqUsersOnLogin(decodePacket);
@@ -200,7 +201,8 @@ public class C6ServerMain {
                                 }
 
                                 // in caso si aggiungesse un nuovo netfriend scatta il comando 03 , come da documentazione
-                                // a volte entra direttamente qui altre volte sopra ( è un errore del client che ha un comportamento non deterministico)
+                                // TO DO questo crasha in getReqUsers va sistemato!
+
                                 if (cmdClient == C6EnumClient.REQ_USERS.getCode()) {
                                     List<String> netFriends = UtilsProtocol.getReqUsers(decodePacket);
 
@@ -218,6 +220,9 @@ public class C6ServerMain {
                                     }
 
                                     byte[] sendUsersCmd = sendUsersEntity.getSndUsers();
+
+                                    out.write(sendUsersCmd);
+                                    out.flush();
                                 }
 
                             }

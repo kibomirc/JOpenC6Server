@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UtilsProtocol {
 
-    private final static Integer INIT_NICK_LIST = 12;
+    private final static Integer INIT_NICK_LIST = 14;
 
     public static byte[] concatBytes(byte[] len, byte[] bytes) {
         byte[] result = new byte[len.length + bytes.length];
@@ -26,9 +26,11 @@ public class UtilsProtocol {
 
     public static List<String> getReqUsers(byte[] decodePacket) {
         // 10 0F 00 06 00 10 10 03 00 06 00 0A 00 01 07 62 69 67 61 6C 65 78 (in tuo onore xD)
+        // 10 0F 00 03 00 10 10 03 00 03 00 0A 00 01 07 62 69 67 61 6C 65 78 05 30 0A 7D 53 44 31 7D 2A 31 73 2B 74
+        // 10 0F 00 03 00 10 10 03 00 03 00 0A 00 01 07 62 69 67 61 6C 65 78 67 3A 0E 57 5F 3B 47 16 42 3F 5D 0D 07
         List<String> netFriends = new ArrayList<>();
         // 12 e 13 sono i byte per il numero di nick
-        int numNick = ((decodePacket[11] & 0xFF) << 8) | (decodePacket[12] & 0xFF);
+        int numNick = ((decodePacket[12] & 0xFF) << 8) | (decodePacket[13] & 0xFF);
 
         for(int i=0; i < numNick; i++) { // ciclo per il numero dei nick
              // prelevo la lunghezza del nick
@@ -55,9 +57,9 @@ public class UtilsProtocol {
                 .sum();
 
         if(sumNick != 0) {
-            lenNick = decodePacket[INIT_NICK_LIST + sumNick + netFriends.size() + 1] & 0xFF;
+            lenNick = decodePacket[INIT_NICK_LIST + sumNick + netFriends.size()] & 0xFF;
         } else {
-            lenNick = decodePacket[INIT_NICK_LIST + 1] & 0xFF;
+            lenNick = decodePacket[INIT_NICK_LIST] & 0xFF;
         }
 
         return lenNick;
@@ -69,7 +71,7 @@ public class UtilsProtocol {
                 .mapToInt(String::length)
                 .sum();
 
-        return INIT_NICK_LIST + sumNick + netFriends.size() + 2;
+        return INIT_NICK_LIST + sumNick + netFriends.size() + 1;
     }
 
     public static List<String> getReqUsersOnLogin(byte[] decodePacket) {
