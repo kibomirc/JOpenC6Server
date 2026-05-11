@@ -181,7 +181,7 @@ public class C6ServerMain {
                                         // invio utenti online:
                                         // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
 
-                                        List<String> netFriendsOnline = List.of("bigalex","daxweb"); // lista mokkata
+                                        List<String> netFriendsOnline = List.of("prova"); // lista mokkata
                                         SendUsersEntity sendUsersEntity = new SendUsersEntity();
 
                                         sendUsersEntity.setCount(5);
@@ -191,8 +191,8 @@ public class C6ServerMain {
 
                                         byte[] sendUsersCmd = sendUsersEntity.getSndUsers();
 
-                                        //out.write(sendUsersCmd);
-                                        //out.flush();
+                                        out.write(sendUsersCmd);
+                                        out.flush();
 
 
                                     }
@@ -226,6 +226,22 @@ public class C6ServerMain {
 
                                     out.write(sendUsersCmd);
                                     out.flush();
+
+
+                                    List<String> netFriendsOnline2 = List.of("ivan"); // lista mokkata
+                                    SendUsersEntity kk = new SendUsersEntity();
+
+                                    kk.setCount(5);
+                                    for(String netFriendOnline: netFriendsOnline2) {
+                                        kk.addNetFriend(netFriendOnline);
+                                    }
+
+                                    byte[] kkcmd = kk.getSndUsers();
+
+                                    out.write(kkcmd);
+                                    out.flush();
+
+
                                 }
                             }
                         } catch (IOException e) {
