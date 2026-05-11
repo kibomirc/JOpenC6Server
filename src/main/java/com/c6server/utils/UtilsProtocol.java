@@ -75,9 +75,27 @@ public class UtilsProtocol {
     }
 
     public static List<String> getReqUsersOnLogin(byte[] decodePacket) {
-        //10 0F 00 02 00 08 10 0D 00 02 00 02 01 2A 07 18 17 14 17 00 10 03 00 03 00 11 00 02 07 62 69 67 61 6C 65 78 06 64 61 78 77 65 62 07 18 17 13 17 10 10 0A 00 04 00 01 64
+        //Pacchetto Originale: 10 0F 00 02 00 08 10 0D 00 02 00 02 01 2A 3D 67 53 19 29 25 10 03 00 03 00 16 00 03 07 62 69 67 61 6C 65 78 04 69 76 61 6E 06 64 61 78 77 65 62 36 22 68 57 1A 2E 0F 01 45 3F 49 32 74
+        //Pacchetto Normalizzato                                                           10 03 00 03 00 16 00 03 07 62 69 67 61 6C 65 78 04 69 76 61 6E 06 64 61 78 77 65 62 36 22 68 57 1A 2E 0F 01 45 3F 49 32 74
         List<String> netFriends = new ArrayList<>();
-        byte[] normalizePacket = Arrays.copyOfRange(decodePacket, 15, decodePacket.length);
+        byte[] normalizePacket = Arrays.copyOfRange(decodePacket, 14, decodePacket.length);
+
+        System.out.println("");
+
+        System.out.print("Pacchetto Originale: ");
+        for (byte b : decodePacket) {
+            System.out.printf("%02X ", b);
+        }
+        System.out.println(); // Va a capo per separare i flussi
+
+        // 2. Stampa del pacchetto normalizzato (dal byte 19 in poi)
+        System.out.print("Pacchetto Normalizzato (dal 19 a fine): ");
+        for (byte b : normalizePacket) {
+            System.out.printf("%02X ", b);
+        }
+        System.out.println("\n"); // Va a capo due volte
+
+
         netFriends = getReqUsers(normalizePacket);
 
         return netFriends;

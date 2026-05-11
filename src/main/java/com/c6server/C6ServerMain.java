@@ -167,6 +167,13 @@ public class C6ServerMain {
 
                                     if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decodePacket)) {
 
+                                        System.out.println("");
+
+                                        for (byte b : decodePacket) {
+                                            System.out.printf("%02X ", b);
+                                        }
+
+
                                         List<String> netFriends = UtilsProtocol.getReqUsersOnLogin(decodePacket);
 
                                         System.out.println("Vediamo se funziona: " + netFriends);
@@ -199,10 +206,6 @@ public class C6ServerMain {
                                     System.out.println();
 
                                 }
-
-                                // in caso si aggiungesse un nuovo netfriend scatta il comando 03 , come da documentazione
-                                // TO DO questo crasha in getReqUsers va sistemato!
-
                                 if (cmdClient == C6EnumClient.REQ_USERS.getCode()) {
                                     List<String> netFriends = UtilsProtocol.getReqUsers(decodePacket);
 
@@ -211,7 +214,7 @@ public class C6ServerMain {
                                     // invio utenti online:
                                     // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
 
-                                    List<String> netFriendsOnline = List.of("bigalex","daxweb"); // lista mokkata
+                                    List<String> netFriendsOnline = List.of("bigalex"); // lista mokkata
                                     SendUsersEntity sendUsersEntity = new SendUsersEntity();
 
                                     sendUsersEntity.setCount(5);
@@ -224,7 +227,6 @@ public class C6ServerMain {
                                     out.write(sendUsersCmd);
                                     out.flush();
                                 }
-
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
