@@ -51,7 +51,7 @@ public class SendUsersEntity {
         return netFriendsOnlineIndex;
     }
 
-    public byte[] getLength() { // errore nel length
+    public byte[] getLength() {
         int lenNick = getLenNick();
         int nickLength = 0;
         for (NetFriends nf : netFriendsOnline) {
