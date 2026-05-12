@@ -45,13 +45,13 @@ public class SendUsersEntity {
 
     public Integer getLenNick() {
         Integer netFriendsOnlineIndex = 0;
-        while(netFriendsOnlineIndex <= this.netFriendsOnline.size()) {
+        while(netFriendsOnlineIndex < this.netFriendsOnline.size()) {
             netFriendsOnlineIndex++;
         }
         return netFriendsOnlineIndex;
     }
 
-    public byte[] getLength() {
+    public byte[] getLength() { // errore nel length
         int lenNick = getLenNick();
         int nickLength = 0;
         for (NetFriends nf : netFriendsOnline) {
