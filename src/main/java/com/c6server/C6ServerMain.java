@@ -150,7 +150,7 @@ public class C6ServerMain {
                                     sendPulsEntity.setCount(4);
                                     sendPulsEntity.setNumPuls(5);
 
-                                    sendPulsEntity.addButton("C6Online", "https://www.c6online.it");
+                                    sendPulsEntity.addButton("JOpenC6 Server", "https://www.jopenc6.it");
                                     sendPulsEntity.addButton("OpenC6", "https://web.archive.org/web/20040722065013/http://openc6.extracon.it/index.php");
                                     sendPulsEntity.addButton("Icona", "https://www.icona.it/");
                                     sendPulsEntity.addButton("Alice", "https://www.tim.it/");
@@ -163,7 +163,8 @@ public class C6ServerMain {
                                     out.flush();
 
 
-                                    // estrapolo req_user
+                                    // in alcuni test con wine la req_user viene inviata insieme alla SND_PULS
+                                    // la logica sottostante gestisce questa casistica.
 
                                     if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decodePacket)) {
 
@@ -181,7 +182,7 @@ public class C6ServerMain {
                                         // invio utenti online:
                                         // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
 
-                                        List<String> netFriendsOnline = List.of("prova"); // lista mokkata
+                                        List<String> netFriendsOnline = List.of("nick"); // lista mokkata
                                         SendUsersEntity sendUsersEntity = new SendUsersEntity();
 
                                         sendUsersEntity.setCount(5);
