@@ -42,17 +42,8 @@ public class SendUsersEntity {
         return totalLenNumNickBytes;
     }
 
-
-    public Integer getLenNick() {
-        Integer netFriendsOnlineIndex = 0;
-        while(netFriendsOnlineIndex < this.netFriendsOnline.size()) {
-            netFriendsOnlineIndex++;
-        }
-        return netFriendsOnlineIndex;
-    }
-
     public byte[] getLength() {
-        int lenNick = getLenNick();
+        int lenNick = 2;
         int nickLength = 0;
         for (NetFriends nf : netFriendsOnline) {
             nickLength += UtilsProtocol.getLengthField(nf.nick).length;

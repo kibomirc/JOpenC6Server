@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS netfriends (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    netfriends TEXT,
+    user_nickname TEXT NOT NULL,
+    FOREIGN KEY (user_nickname) REFERENCES users(nickname) ON DELETE CASCADE ON UPDATE CASCADE
+);

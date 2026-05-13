@@ -2,6 +2,9 @@ package com.c6server;
 
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumServer;
+import com.c6server.dao.DatabaseConnection;
+import com.c6server.dao.NetFriendsDAO;
+import com.c6server.dao.UserDAO;
 import com.c6server.entity.*;
 import com.c6server.utils.HttpServerUtils;
 import com.c6server.utils.UtilsProtocol;
@@ -15,6 +18,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +52,9 @@ public class C6ServerMain {
                              InputStream in = s.getInputStream();
                              OutputStream out = s.getOutputStream()) {
 
+                            Connection conn = DatabaseConnection.getConnection();
+                            String nickname = null;
+
                             byte[] heloProtocol = {
                                     0x20, 0x12, 0x00, 0x01, 0x00, 0x0B, 0x00, 0x02, 0x08
                             };
@@ -68,6 +76,7 @@ public class C6ServerMain {
                                 // Decodificare i dati
                                 byte[] decodePacket = decodePacket(data, orderKey);
                                 byte cmdClient = extractCmdClient(decodePacket);
+
                                 if (cmdClient == C6EnumClient.LOGIN.getCode()) {
                                     System.out.println("Il client sta effettuando il login");
                                     // TODO IMPLEMENTARE LOGICHE CHECK
@@ -87,8 +96,17 @@ public class C6ServerMain {
                                     }
                                     if (!passCheck) {
                                         System.out.println("Password Sbagliata!");
+                                        throw new IOException("Password Sbagliata!");
                                     } else {
                                         System.out.println("Password corretta! ... procediamo con autenticazione");
+
+                                        UserDAO userDAO = new UserDAO(conn);
+
+                                        if (!userDAO.exists(loginEntity.getNick())) {
+                                            userDAO.create(loginEntity.getNick());
+                                        }
+
+                                        nickname = loginEntity.getNick();
                                     }
 
                                     // TODO FARE CHCEK INFOLOGIN
@@ -212,10 +230,16 @@ public class C6ServerMain {
 
                                     System.out.println("Vediamo se funziona: " + netFriends);
 
-                                    // invio utenti online:
-                                    // TODO dovrebbe fare un check sul db -- iniziamo con un valore mockato
+                                    NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
+                                    netFriendsDAO.saveOrUpdateList(netFriends,nickname);
 
-                                    List<String> netFriendsOnline = List.of("ivan","bigalex"); // lista mokkata
+                                    // invio utenti online:
+                                    // TODO dovrebbe ritornare solo quelli on line attualmente non controllo lo stato
+                                    // TODO e ritorno tutti quelli che mi richide come se fossero online;
+                                    // TODO da implementare questa funzionalità
+
+                                    List<String> netFriendsOnline = netFriendsDAO.getListContentByUser(nickname); // lista mokkata
+                                    //List<String> netFriendsOnline = List.of("ivan","bigalex","prova");
                                     SendUsersEntity sendUsersEntity = new SendUsersEntity();
 
                                     sendUsersEntity.setCount(0);
@@ -231,7 +255,7 @@ public class C6ServerMain {
 
                                 }
                             }
-                        } catch (IOException e) {
+                        } catch (IOException | SQLException e) {
                             e.printStackTrace();
                         } catch (NoSuchAlgorithmException e) {
                             throw new RuntimeException(e);
