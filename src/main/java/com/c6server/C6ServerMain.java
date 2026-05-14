@@ -111,8 +111,6 @@ public class C6ServerMain {
                                         nickname = loginEntity.getNick();
                                     }
 
-                                    // TODO FARE CHCEK INFOLOGIN
-
                                     InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
                                     infoLoginEntity.setCount(2);
                                     //numBanner attualmente solo uno
@@ -135,7 +133,6 @@ public class C6ServerMain {
                                     //out.flush();
                                     System.out.println();
 
-                                    //TODO FARE CHECK SU WELCOME MESSAGE
                                     WelcomeEntity welcomeEntity = new WelcomeEntity();
                                     welcomeEntity.setCount(3);
                                     welcomeEntity.setBenvenuto("Benvenuto. In italia sono ... non importa, goditi il momento!");
@@ -236,9 +233,6 @@ public class C6ServerMain {
                                     netFriendsDAO.saveOrUpdateList(netFriends,nickname);
 
                                     // invio utenti online:
-                                    // TODO dovrebbe ritornare solo quelli on line attualmente non controllo lo stato
-                                    // TODO e ritorno tutti quelli che mi richide come se fossero online;
-                                    // TODO da implementare questa funzionalità
 
                                     List<String> netFriendsOnline = netFriendsDAO.getNetFriendsOnline(nickname);
                                     //List<String> netFriendsOnline = List.of("ivan","bigalex","prova"); // lista mokkata
