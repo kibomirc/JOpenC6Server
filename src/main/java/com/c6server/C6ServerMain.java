@@ -27,7 +27,9 @@ import java.util.List;
 public class C6ServerMain {
     private static final Logger logger = LogManager.getLogger(C6ServerMain.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
+
+        Connection conn = DatabaseConnection.getConnection();
 
         // server http per infoLogin
         new Thread(() -> { // lo metto in un thread separato per buona pratica
@@ -52,7 +54,6 @@ public class C6ServerMain {
                              InputStream in = s.getInputStream();
                              OutputStream out = s.getOutputStream()) {
 
-                            Connection conn = DatabaseConnection.getConnection();
                             String nickname = null;
 
                             byte[] heloProtocol = {
@@ -103,7 +104,8 @@ public class C6ServerMain {
                                         UserDAO userDAO = new UserDAO(conn);
 
                                         if (!userDAO.exists(loginEntity.getNick())) {
-                                            userDAO.create(loginEntity.getNick());
+                                            //userDAO.create(loginEntity.getNick());
+                                            throw new IOException("L'Utente non esiste!");
                                         }
 
                                         nickname = loginEntity.getNick();
@@ -238,8 +240,8 @@ public class C6ServerMain {
                                     // TODO e ritorno tutti quelli che mi richide come se fossero online;
                                     // TODO da implementare questa funzionalità
 
-                                    List<String> netFriendsOnline = netFriendsDAO.getListContentByUser(nickname); // lista mokkata
-                                    //List<String> netFriendsOnline = List.of("ivan","bigalex","prova");
+                                    List<String> netFriendsOnline = netFriendsDAO.getNetFriendsOnline(nickname);
+                                    //List<String> netFriendsOnline = List.of("ivan","bigalex","prova"); // lista mokkata
                                     SendUsersEntity sendUsersEntity = new SendUsersEntity();
 
                                     sendUsersEntity.setCount(0);

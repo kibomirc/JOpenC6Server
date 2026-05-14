@@ -96,6 +96,31 @@ public class NetFriendsDAO {
     }
 
 
+    public List<String> getNetFriendsOnline(String userNickname) throws SQLException {
+        String sql = "SELECT json_group_array(j.value) AS netfriends " +
+                "FROM netfriends n, json_each(n.netfriends) j " +
+                "JOIN users u ON u.nickname = j.value " +
+                "WHERE n.user_nickname = ? AND u.online = 1;";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, userNickname);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String jsonDalDb = rs.getString("netfriends");
+
+                    if (jsonDalDb != null && !jsonDalDb.isEmpty()) {
+                        return objectMapper.readValue(jsonDalDb, new TypeReference<List<String>>() {});
+                    }
+                }
+            }
+        } catch (JsonProcessingException e) {
+            throw new SQLException("Errore Jackson durante la deserializzazione della lista", e);
+        }
+        return new ArrayList<>();
+    }
+
+
+
     public void deleteList(String userNickname) throws SQLException {
         String sql = "DELETE FROM netfriends WHERE user_nickname = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
