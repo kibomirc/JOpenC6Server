@@ -1,4 +1,4 @@
-#  C6 Java Server
+#  JOpenC6Server
 
 [![Java Version](https://shields.io)](https://openjdk.org)
 [![Database](https://shields.io)](https://sqlite.org)
