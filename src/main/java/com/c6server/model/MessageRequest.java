@@ -4,7 +4,8 @@ public class MessageRequest {
     private String nickMittente;
     private String nickDestinatario;
     private String testo;
-    private String stile;
+    private byte[] stile;
+    private String messaggio;
 
     public String getNickMittente() {
         return nickMittente;
@@ -30,12 +31,20 @@ public class MessageRequest {
         this.testo = testo;
     }
 
-    public String getStile() {
+    public byte[] getStile() {
         return stile;
     }
 
-    public void setStile(String stile) {
+    public void setStile(byte[] stile) {
         this.stile = stile;
+    }
+
+    public String getMessaggio() {
+        return messaggio;
+    }
+
+    public void setMessaggio(String messaggio) {
+        this.messaggio = messaggio;
     }
 }
 

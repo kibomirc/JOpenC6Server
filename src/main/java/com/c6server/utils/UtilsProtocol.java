@@ -334,6 +334,90 @@ public class UtilsProtocol {
     public static MessageRequest parseMessage(byte[] decoded) {
         // estrai nick mittente, nick destinatario, testo
         // restituisce un oggetto con i dati
-        return null;
+        //10 0F 00 05 00 1D 10 08 00 05 00 17 04 69 76 61 6E 00 01 07 62 69 67 61 6C 65 78 00 06 02 00 43 69 61 6F
+        int offset = 12;
+
+
+        String nickMittente = extractNickMittente(decoded);
+        String nickDestinatario = extractNickDestinatario(decoded);
+        byte[] stile = extractStile(decoded);
+        String message = extractMessaggio(decoded);
+
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setNickMittente(nickMittente);
+        messageRequest.setNickDestinatario(nickDestinatario);
+        messageRequest.setStile(stile);
+        messageRequest.setMessaggio(message);
+
+        return messageRequest;
+    }
+
+
+    private static String extractNickMittente(byte[] decoded) {
+        int offset = 12; // salta l'header
+
+        int lenMittente = decoded[offset] & 0xFF; // 04
+        offset++;
+
+        return new String(decoded, offset, lenMittente, StandardCharsets.UTF_8); // ivan
+    }
+
+    private static String extractNickDestinatario(byte[] decoded) {
+        int offset = 12; // salta l'header
+
+        int lenMittente = decoded[offset] & 0xFF; // 04
+        offset++;
+        offset += lenMittente;
+
+        offset += 2; // salta i 2 byte ignoti 00 01
+
+        int lenDestinatario = decoded[offset] & 0xFF; // 07
+        offset++;
+
+        return new String(decoded, offset, lenDestinatario, StandardCharsets.UTF_8);
+    }
+
+    public static byte[] extractStile(byte[] decoded) {
+        int offset = 12; // salta header
+
+        // salta nick mittente
+        int lenMittente = decoded[offset] & 0xFF;
+        offset++;
+        offset += lenMittente;
+
+        offset += 2; // salta 00 01
+
+        // salta nick destinatario
+        int lenDestinatario = decoded[offset] & 0xFF;
+        offset++;
+        offset += lenDestinatario;
+
+        offset += 2; // salta 00 06
+
+        // estrai i 2 byte dello stile
+        return new byte[] { decoded[offset], decoded[offset + 1] };
+    }
+
+    private static String extractMessaggio(byte[] decoded) {
+        int offset = 12; // salta header
+
+        // salta nick mittente
+        int lenMittente = decoded[offset] & 0xFF;
+        offset++;
+        offset += lenMittente;
+
+        offset += 2; // salta 00 01
+
+        // salta nick destinatario
+        int lenDestinatario = decoded[offset] & 0xFF;
+        offset++;
+        offset += lenDestinatario;
+
+        offset += 2; // salta 00 06
+        offset += 2; // salta stile 02 00
+
+        // tutto il resto è il messaggio
+        int lenMessaggio = decoded.length - offset;
+        return new String(decoded, offset, lenMessaggio, StandardCharsets.UTF_8);
     }
 }

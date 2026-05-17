@@ -1,5 +1,8 @@
 package com.c6server.packet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 public class SrvMessagePacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x0F };
    // TO DO da implementare
@@ -10,4 +13,10 @@ public class SrvMessagePacket {
 
     // costruisce i byte da spedire al destinatario
     public byte[] getPacket() { return null; }
+
+    public byte[] getSrvMessagePacket() throws IOException {
+
+
+        return null;
+    }
 }

@@ -1,9 +1,11 @@
 package com.c6server.handler;
 
+import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.UserDAO;
 import com.c6server.model.LoginEntity;
+import com.c6server.model.MessageRequest;
 import com.c6server.packet.*;
 import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +46,7 @@ public class ClientHandler {
 
                 if (cmdClient == C6EnumClient.LOGIN.getCode()) {
                     nickname = handleLogin(decoded, key, out, conn);
+                    ClientRegistry.register(nickname, out);
                 }
                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
                     handleReqPuls(decoded, out);
@@ -51,11 +54,16 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.REQ_USERS.getCode()) {
                     handleReqUsers(decoded, out, nickname, conn);
                 }
+                if (cmdClient == C6EnumClient.OL_MESSAGE.getCode()) {
+                    handleOLMessage(decoded,out);
+                }
             }
 
         } catch (IOException | SQLException e) {
             logger.error("Errore connessione client", e);
+            ClientRegistry.unregister(nickname);
         } catch (NoSuchAlgorithmException e) {
+            ClientRegistry.unregister(nickname);
             throw new RuntimeException(e);
         }
     }
@@ -182,6 +190,28 @@ public class ClientHandler {
 
         List<String> netFriendsOnline = netFriendsDAO.getNetFriendsOnline(nickname);
         sendOnlineUsers(netFriendsOnline, 0, out);
+    }
+
+
+    //--------------------------------------------------------------------------
+    // OL_MESSAGE - invia messaggio privato utente
+    //--------------------------------------------------------------------------
+
+    private static void handleOLMessage(byte[] decoded, OutputStream out) throws IOException {
+
+        MessageRequest messageRequest = UtilsProtocol.parseMessage(decoded);
+        SrvMessagePacket srvMessagePacket = new SrvMessagePacket();
+        /*
+            settare gli altri campi di srvMessagePacket
+         */
+
+        OutputStream outDest = ClientRegistry.getOutputStream(messageRequest.getNickDestinatario());
+        if (outDest != null) {
+            outDest.write(srvMessagePacket.getSrvMessagePacket());
+            outDest.flush();
+        } else {
+            System.out.println("L' utente si è scollegato usare OF_MESSAGE");
+        }
     }
 
     // -------------------------------------------------------------------------
