@@ -1,4 +1,4 @@
-package com.c6server.entity;
+package com.c6server.model;
 
 public class LoginEntity {
 

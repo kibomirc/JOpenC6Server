@@ -1,10 +1,10 @@
-package com.c6server.entity;
+package com.c6server.packet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class InfoLoginEntity {
+public class InfoLoginPacket {
 
     private final byte[] SERVER_COMMAND = new byte[] {0x20, 0x01};
     private final byte[] UNKNOWBYTE_1 = new byte[] {0x00, 0x00, 0x00, 0x01};

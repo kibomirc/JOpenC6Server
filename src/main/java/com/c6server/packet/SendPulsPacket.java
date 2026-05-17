@@ -1,15 +1,14 @@
-package com.c6server.entity;
+package com.c6server.packet;
 
 import com.c6server.utils.UtilsProtocol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SendPulsEntity {
+public class SendPulsPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x15 };
 
     private Integer count;

@@ -1,4 +1,4 @@
-package com.c6server.entity;
+package com.c6server.packet;
 
 import com.c6server.utils.UtilsProtocol;
 
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SendUsersEntity {
+public class SendUsersPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x06 };
 
     private Integer count;
@@ -65,7 +65,7 @@ public class SendUsersEntity {
         sndUsersComposit.write(getCount());
         sndUsersComposit.write(getLength());
         sndUsersComposit.write(getNumNick());
-        for (SendUsersEntity.NetFriends netFriend : netFriendsOnline) {
+        for (SendUsersPacket.NetFriends netFriend : netFriendsOnline) {
             sndUsersComposit.write(UtilsProtocol.getLengthField(netFriend.nick));
         }
 

@@ -3,7 +3,8 @@ package com.c6server.handler;
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.UserDAO;
-import com.c6server.entity.*;
+import com.c6server.model.LoginEntity;
+import com.c6server.packet.*;
 import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,7 +118,7 @@ public class ClientHandler {
     }
 
     private static byte[] buildInfoLoginResponse() throws IOException {
-        InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
+        InfoLoginPacket infoLoginEntity = new InfoLoginPacket();
         infoLoginEntity.setCount(2);
         infoLoginEntity.setGif("http://localhost:80/images/banner1.gif");
         infoLoginEntity.setLinkBanner("http://localhost:80/welcome");
@@ -126,13 +127,13 @@ public class ClientHandler {
         infoLoginEntity.setLinkButton("https://www.c6online.it");
         infoLoginEntity.setDescr("JC6Server");
 
-        WelcomeEntity welcomeEntity = new WelcomeEntity();
-        welcomeEntity.setCount(3);
-        welcomeEntity.setBenvenuto("Benvenuto. In italia sono ... non importa, goditi il momento!");
+        WelcomeEntityPacket welcomeEntityPacket = new WelcomeEntityPacket();
+        welcomeEntityPacket.setCount(3);
+        welcomeEntityPacket.setBenvenuto("Benvenuto. In italia sono ... non importa, goditi il momento!");
 
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         buf.write(infoLoginEntity.getInfoLogin());
-        buf.write(welcomeEntity.getWelcomeMessage());
+        buf.write(welcomeEntityPacket.getWelcomeMessage());
         return buf.toByteArray();
     }
 
@@ -143,16 +144,16 @@ public class ClientHandler {
     private static void handleReqPuls(byte[] decoded, OutputStream out)
             throws IOException, NoSuchAlgorithmException {
 
-        SendPulsEntity sendPulsEntity = new SendPulsEntity();
-        sendPulsEntity.setCount(4);
-        sendPulsEntity.setNumPuls(5);
-        sendPulsEntity.addButton("JOpenC6 Server", "https://www.jopenc6.it");
-        sendPulsEntity.addButton("OpenC6",  "https://web.archive.org/web/20040722065013/http://openc6.extracon.it/index.php");
-        sendPulsEntity.addButton("Icona",   "https://www.icona.it/");
-        sendPulsEntity.addButton("Alice",   "https://www.tim.it/");
-        sendPulsEntity.addButton("Virgilio","https://www.virgilio.it/");
+        SendPulsPacket sendPulsPacket = new SendPulsPacket();
+        sendPulsPacket.setCount(4);
+        sendPulsPacket.setNumPuls(5);
+        sendPulsPacket.addButton("JOpenC6 Server", "https://www.jopenc6.it");
+        sendPulsPacket.addButton("OpenC6",  "https://web.archive.org/web/20040722065013/http://openc6.extracon.it/index.php");
+        sendPulsPacket.addButton("Icona",   "https://www.icona.it/");
+        sendPulsPacket.addButton("Alice",   "https://www.tim.it/");
+        sendPulsPacket.addButton("Virgilio","https://www.virgilio.it/");
 
-        out.write(sendPulsEntity.getSndPuls());
+        out.write(sendPulsPacket.getSndPuls());
         out.flush();
         logger.debug("SND_PULS inviato");
 
@@ -162,7 +163,7 @@ public class ClientHandler {
             List<String> netFriends = UtilsProtocol.getReqUsersOnLogin(decoded);
             // TODO: sostituire con check reale su DB
             List<String> netFriendsOnline = List.of("nick"); // lista mockkata
-            UtilsProtocol.sendOnlineUsers(netFriendsOnline, 5, out);
+            sendOnlineUsers(netFriendsOnline, 5, out);
         }
     }
 
@@ -180,6 +181,22 @@ public class ClientHandler {
         netFriendsDAO.saveOrUpdateList(netFriends, nickname);
 
         List<String> netFriendsOnline = netFriendsDAO.getNetFriendsOnline(nickname);
-        UtilsProtocol.sendOnlineUsers(netFriendsOnline, 0, out);
+        sendOnlineUsers(netFriendsOnline, 0, out);
+    }
+
+    // -------------------------------------------------------------------------
+    // costruisce e invia SND_USERS
+    // -------------------------------------------------------------------------
+
+    public static void sendOnlineUsers(List<String> onlineNicks, int count, OutputStream out)
+            throws IOException, NoSuchAlgorithmException {
+
+        SendUsersPacket sendUsersPacket = new SendUsersPacket();
+        sendUsersPacket.setCount(count);
+        for (String nick : onlineNicks) {
+            sendUsersPacket.addNetFriend(nick);
+        }
+        out.write(sendUsersPacket.getSndUsers());
+        out.flush();
     }
 }

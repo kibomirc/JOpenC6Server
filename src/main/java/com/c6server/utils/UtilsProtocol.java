@@ -1,7 +1,7 @@
 package com.c6server.utils;
 
-import com.c6server.entity.LoginEntity;
-import com.c6server.entity.SendUsersEntity;
+import com.c6server.model.LoginEntity;
+import com.c6server.packet.SendUsersPacket;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -331,21 +331,5 @@ public class UtilsProtocol {
         loginEntity.setNickEncoded(nickEncode);
 
         return loginEntity;
-    }
-
-    // -------------------------------------------------------------------------
-    // costruisce e invia SND_USERS
-    // -------------------------------------------------------------------------
-
-    public static void sendOnlineUsers(List<String> onlineNicks, int count, OutputStream out)
-            throws IOException, NoSuchAlgorithmException {
-
-        SendUsersEntity sendUsersEntity = new SendUsersEntity();
-        sendUsersEntity.setCount(count);
-        for (String nick : onlineNicks) {
-            sendUsersEntity.addNetFriend(nick);
-        }
-        out.write(sendUsersEntity.getSndUsers());
-        out.flush();
     }
 }

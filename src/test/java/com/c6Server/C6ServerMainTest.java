@@ -1,10 +1,10 @@
 package com.c6Server;
 
 import com.c6server.C6ServerMain;
-import com.c6server.entity.InfoLoginEntity;
-import com.c6server.entity.LoginEntity;
-import com.c6server.entity.SendPulsEntity;
-import com.c6server.entity.WelcomeEntity;
+import com.c6server.packet.InfoLoginPacket;
+import com.c6server.model.LoginEntity;
+import com.c6server.packet.SendPulsPacket;
+import com.c6server.packet.WelcomeEntityPacket;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -127,7 +127,7 @@ public class C6ServerMainTest
 
     @Test
     void testInfoLogin() throws IOException {
-         InfoLoginEntity infoLoginEntity = new InfoLoginEntity();
+         InfoLoginPacket infoLoginEntity = new InfoLoginPacket();
          infoLoginEntity.setCount(2);
          //numBanner attualmente solo uno
         infoLoginEntity.setGif("/Users/ivan/Desktop/dragon-ball-dragon-ball-z.gif");
@@ -148,11 +148,11 @@ public class C6ServerMainTest
 
     @Test
     void testWelcomeMessage() throws IOException {
-        WelcomeEntity welcomeEntity = new WelcomeEntity();
-        welcomeEntity.setCount(3);
-        welcomeEntity.setBenvenuto("Welcome Message!");
+        WelcomeEntityPacket welcomeEntityPacket = new WelcomeEntityPacket();
+        welcomeEntityPacket.setCount(3);
+        welcomeEntityPacket.setBenvenuto("Welcome Message!");
 
-        byte[] welcomeMessageCmd = welcomeEntity.getWelcomeMessage();
+        byte[] welcomeMessageCmd = welcomeEntityPacket.getWelcomeMessage();
 
         System.out.println("Welcome Message:");
         for (byte b : welcomeMessageCmd) {
@@ -163,14 +163,14 @@ public class C6ServerMainTest
 
     @Test
     void testSendPuls() throws IOException {
-        SendPulsEntity sendPulsEntity = new SendPulsEntity();
-        sendPulsEntity.setCount(3);
-        sendPulsEntity.setNumPuls(1);
-        sendPulsEntity.setDescr("Descrizione sendPuls");
-        sendPulsEntity.setLink("http://localhost:80/sndPuls");
+        SendPulsPacket sendPulsPacket = new SendPulsPacket();
+        sendPulsPacket.setCount(3);
+        sendPulsPacket.setNumPuls(1);
+        sendPulsPacket.setDescr("Descrizione sendPuls");
+        sendPulsPacket.setLink("http://localhost:80/sndPuls");
 
 
-        byte[] sendPulsCmd = sendPulsEntity.getSndPuls();
+        byte[] sendPulsCmd = sendPulsPacket.getSndPuls();
 
         System.out.println("SND_PULS:");
         for (byte b : sendPulsCmd) {
