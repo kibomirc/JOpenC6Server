@@ -37,8 +37,8 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [ ] **Refactoring strutturale:** Ottimizzazione e scomposizione della classe logica principale.
-- [ ] **Allineamento standard:** Revisione globale del codice sorgente per l'adeguamento alla corretta *naming convention* di Java.
+- [X] **Refactoring strutturale:** Ottimizzazione e scomposizione della classe logica principale.
+- [X] **Allineamento standard:** Revisione globale del codice sorgente per l'adeguamento alla corretta *naming convention* di Java.
 - [ ] **Messaggistica Privata (`SND_MSG`):** Implementazione delle funzionalità per l'invio e il recapito dei messaggi privati per consentire la comunicazione tra utenti in conversazioni singole.
 
 ---

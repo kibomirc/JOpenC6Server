@@ -1,10 +1,8 @@
 package com.c6server.utils;
 
 import com.c6server.model.LoginEntity;
-import com.c6server.packet.SendUsersPacket;
+import com.c6server.model.MessageRequest;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -331,5 +329,11 @@ public class UtilsProtocol {
         loginEntity.setNickEncoded(nickEncode);
 
         return loginEntity;
+    }
+
+    public static MessageRequest parseMessage(byte[] decoded) {
+        // estrai nick mittente, nick destinatario, testo
+        // restituisce un oggetto con i dati
+        return null;
     }
 }
