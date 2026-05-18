@@ -30,6 +30,7 @@ public class ClientHandler {
 
     public static void handle(Socket socket, Connection conn) {
         String nickname = null;
+        System.out.println("Nuova connessione da: " + socket.getInetAddress() + ":" + socket.getPort());
 
         try (Socket s = socket;
              InputStream in = s.getInputStream();
@@ -203,7 +204,7 @@ public class ClientHandler {
         MessageRequest messageRequest = UtilsProtocol.parseMessage(decoded);
         SrvMessagePacket srvMessagePacket = new SrvMessagePacket();
 
-        srvMessagePacket.setCount(0);
+        srvMessagePacket.setCount(6);
         srvMessagePacket.setNickMittente(messageRequest.getNickMittente());
         srvMessagePacket.setNickDestinatario(messageRequest.getNickDestinatario());
         srvMessagePacket.setStile(messageRequest.getStile());

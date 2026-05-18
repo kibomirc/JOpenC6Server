@@ -22,7 +22,6 @@ public class C6ServerMain {
 
     public static void main(String[] args) throws IOException, SQLException {
 
-        Connection conn = DatabaseConnection.getConnection();
 
         threadPool.submit(() -> {
             try {
@@ -37,7 +36,15 @@ public class C6ServerMain {
                 logger.info("In ascolto sulla porta " + PORT);
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    threadPool.submit(() -> ClientHandler.handle(clientSocket, conn));
+                    clientSocket.setKeepAlive(true);
+                    threadPool.submit(() -> {
+                        try {
+                            Connection clientConn = DatabaseConnection.getConnection();
+                            ClientHandler.handle(clientSocket, clientConn);
+                        } catch (SQLException e) {
+                            logger.error("Errore connessione DB", e);
+                        }
+                    });
                 }
             } catch (IOException e) {
                 logger.error("Errore ServerSocket", e);

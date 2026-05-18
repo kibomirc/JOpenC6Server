@@ -128,6 +128,7 @@ public class SrvMessagePacket {
 
         srvMessagePacketComposit.write(SERVER_COMMAND);
         srvMessagePacketComposit.write(getCount());
+        srvMessagePacketComposit.write(getLength());
         srvMessagePacketComposit.write(getLengthWithMittente());
         srvMessagePacketComposit.write(getLengthWithDestinatario());
         srvMessagePacketComposit.write(getLengthStileWithMessage());
