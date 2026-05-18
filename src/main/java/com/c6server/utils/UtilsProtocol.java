@@ -352,7 +352,6 @@ public class UtilsProtocol {
         return messageRequest;
     }
 
-
     private static String extractNickMittente(byte[] decoded) {
         int offset = 12; // salta l'header
 

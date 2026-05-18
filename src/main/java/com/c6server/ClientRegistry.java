@@ -1,5 +1,6 @@
 package com.c6server;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,6 +18,18 @@ public class ClientRegistry {
 
     public static OutputStream getOutputStream(String nickname) {
         return clients.get(nickname);
+    }
+
+    public static void sendTo(String nickname, byte[] data) throws IOException {
+        OutputStream out = clients.get(nickname);
+        if (out != null) {
+            synchronized (out) { // un solo thread alla volta scrive su questa out
+                out.write(data);
+                out.flush();
+            }
+        } else {
+            System.out.println();
+        }
     }
 
     public static boolean isOnline(String nickname) {

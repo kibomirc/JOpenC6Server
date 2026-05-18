@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -201,17 +202,13 @@ public class ClientHandler {
 
         MessageRequest messageRequest = UtilsProtocol.parseMessage(decoded);
         SrvMessagePacket srvMessagePacket = new SrvMessagePacket();
-        /*
-            settare gli altri campi di srvMessagePacket
-         */
 
-        OutputStream outDest = ClientRegistry.getOutputStream(messageRequest.getNickDestinatario());
-        if (outDest != null) {
-            outDest.write(srvMessagePacket.getSrvMessagePacket());
-            outDest.flush();
-        } else {
-            System.out.println("L' utente si è scollegato usare OF_MESSAGE");
-        }
+        srvMessagePacket.setNickMittente(messageRequest.getNickMittente());
+        srvMessagePacket.setNickDestinatario(messageRequest.getNickDestinatario());
+        srvMessagePacket.setStile(messageRequest.getStile());
+        srvMessagePacket.setMessaggio(messageRequest.getMessaggio());
+
+        ClientRegistry.sendTo(messageRequest.getNickDestinatario(),messageRequest.getMessaggio().getBytes(StandardCharsets.UTF_8));
     }
 
     // -------------------------------------------------------------------------
