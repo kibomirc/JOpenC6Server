@@ -84,15 +84,17 @@ public class SrvMessagePacket {
         return concatBytes(new byte[]{lenNickDestinatarioByte}, nickDestinatarioBytes);
     }
 
-    public byte[] getLengthStile() {
-        int lenStile = stile.length;
 
-        byte[] lenStileBytes = new byte[2];
-        lenStileBytes[0] = (byte) ((lenStile >> 8) & 0xFF);
-        lenStileBytes[1] = (byte) (lenStile & 0xFF);
+    public byte[] getLengthStileWithMessage() {
+        int totalLen = stile.length + messaggio.getBytes(StandardCharsets.UTF_8).length;
 
-        return lenStileBytes;
+        byte[] lenBytes = new byte[2];
+        lenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
+        lenBytes[1] = (byte) (totalLen & 0xFF);
+
+        return lenBytes;
     }
+
 
     public byte[] getLengthMessaggio() {
         int lenMessaggio = messaggio.length();
@@ -100,7 +102,7 @@ public class SrvMessagePacket {
 
         byte[] messaggioBytes = messaggio.getBytes(StandardCharsets.UTF_8);
 
-        return concatBytes(new byte[]{lenMessaggioByte}, messaggioBytes);
+        return messaggioBytes;
     }
 
     // costruisce i byte da spedire al destinatario
@@ -108,10 +110,11 @@ public class SrvMessagePacket {
 
         int lenNickMittente = getLengthWithMittente().length;
         int lenNickDestinatario = getLengthWithDestinatario().length;
-        int lenStile = getLengthStile().length;
+        int lenStileWithMessage  = getLengthStileWithMessage().length;
+        int lenStileBytes  = stile.length;
         int lenMessaggio = getLengthMessaggio().length;
 
-        int totalLen = lenNickMittente + lenNickDestinatario + lenStile + lenMessaggio;
+        int totalLen = lenNickMittente + lenNickDestinatario + lenStileWithMessage + lenStileBytes + lenMessaggio;
 
         byte[] totalLenBytes = new byte[2];
         totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
@@ -127,10 +130,22 @@ public class SrvMessagePacket {
         srvMessagePacketComposit.write(getCount());
         srvMessagePacketComposit.write(getLengthWithMittente());
         srvMessagePacketComposit.write(getLengthWithDestinatario());
-        srvMessagePacketComposit.write(getLengthStile());
-        srvMessagePacketComposit.write(getLengthMessaggio());
+        srvMessagePacketComposit.write(getLengthStileWithMessage());
+        srvMessagePacketComposit.write(getStile());
+        srvMessagePacketComposit.write(getMessaggio().getBytes(StandardCharsets.UTF_8));
 
         byte[] srvMessagePack = srvMessagePacketComposit.toByteArray();
+
+        System.out.println("LOG PACCHETTO COMPLETO:");
+        System.out.println("Server Command: " + java.util.HexFormat.ofDelimiter(" ").formatHex(SERVER_COMMAND));
+        System.out.println("Command Count: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getCount()));
+        System.out.println("Length (Total): " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLength()));
+
+        System.out.println("Length With Nick Mittente: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithMittente()));
+        System.out.println("Length With Nick Destinatario: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithDestinatario()));
+        System.out.println("Length Stile With Message: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthStileWithMessage()));
+        System.out.println("Stile: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getStile()));
+        System.out.println("Messaggio: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getMessaggio().getBytes(StandardCharsets.UTF_8)));
 
         return srvMessagePack;
     }

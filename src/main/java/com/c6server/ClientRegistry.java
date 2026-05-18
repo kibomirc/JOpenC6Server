@@ -28,7 +28,7 @@ public class ClientRegistry {
                 out.flush();
             }
         } else {
-            System.out.println();
+            System.out.println("Utente non collegato bisogna usare OF_MESSAGE");
         }
     }
 

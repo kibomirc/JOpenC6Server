@@ -61,7 +61,7 @@ public class ClientHandler {
             }
 
         } catch (IOException | SQLException e) {
-            logger.error("Errore connessione client", e);
+            logger.error("Errore connessione client " + nickname + " — " + e.getMessage());
             ClientRegistry.unregister(nickname);
         } catch (NoSuchAlgorithmException e) {
             ClientRegistry.unregister(nickname);
@@ -203,12 +203,13 @@ public class ClientHandler {
         MessageRequest messageRequest = UtilsProtocol.parseMessage(decoded);
         SrvMessagePacket srvMessagePacket = new SrvMessagePacket();
 
+        srvMessagePacket.setCount(0);
         srvMessagePacket.setNickMittente(messageRequest.getNickMittente());
         srvMessagePacket.setNickDestinatario(messageRequest.getNickDestinatario());
         srvMessagePacket.setStile(messageRequest.getStile());
         srvMessagePacket.setMessaggio(messageRequest.getMessaggio());
 
-        ClientRegistry.sendTo(messageRequest.getNickDestinatario(),messageRequest.getMessaggio().getBytes(StandardCharsets.UTF_8));
+        ClientRegistry.sendTo(messageRequest.getNickDestinatario(), srvMessagePacket.getSrvMessagePacket());
     }
 
     // -------------------------------------------------------------------------
