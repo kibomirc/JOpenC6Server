@@ -11,17 +11,13 @@ public class NetFriendsDAO {
         this.connection = connection;
     }
 
-    public void addNetFriend(String userNickname, String friendNickname) throws SQLException {
-        String sql = "INSERT OR IGNORE INTO netfriends (user_nickname, netfriend) VALUES (?, ?);";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, userNickname);
-            pstmt.setString(2, friendNickname);
-            pstmt.executeUpdate();
-            System.out.println("Amico aggiunto: " + friendNickname + " per l'utente: " + userNickname);
-        }
-    }
-
     public void addNetFriends(String userNickname, List<String> netFriends) throws SQLException {
+        if (netFriends == null || netFriends.isEmpty()) return;
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = OFF;");
+        }
+
         String sql = "INSERT OR IGNORE INTO netfriends (user_nickname, netfriend) VALUES (?, ?);";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
