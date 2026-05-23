@@ -188,7 +188,7 @@ public class ClientHandler {
         logger.debug("REQ_USERS ricevuto, netFriends: " + netFriends);
 
         NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
-        netFriendsDAO.saveOrUpdateList(netFriends, nickname);
+        netFriendsDAO.addNetFriends(nickname,netFriends);
 
         List<String> netFriendsOnline = netFriendsDAO.getNetFriendsOnline(nickname);
         sendOnlineUsers(netFriendsOnline, 0, out);
