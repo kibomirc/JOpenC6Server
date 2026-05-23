@@ -63,13 +63,16 @@ public class NetFriendsDAO {
         return netFriends;
     }
 
-    public void deleteNetFriend(String userNickname, String friendNickname) throws SQLException {
+    public void deleteNetFriends(String userNickname, List<String> netFriends) throws SQLException {
         String sql = "DELETE FROM netfriends WHERE user_nickname = ? AND netfriend = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, userNickname);
-            pstmt.setString(2, friendNickname);
-            pstmt.executeUpdate();
-            System.out.println("Amico rimosso: " + friendNickname);
+            for (String netFriend : netFriends) {
+                pstmt.setString(1, userNickname);
+                pstmt.setString(2, netFriend);
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+            System.out.println("NetFriend rimosso per l'utente: " + userNickname);
         }
     }
 

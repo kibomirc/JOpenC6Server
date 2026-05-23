@@ -59,6 +59,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.OL_MESSAGE.getCode()) {
                     handleOLMessage(decoded,out);
                 }
+                if (cmdClient == C6EnumClient.DEL_USERS.getCode()) {
+                    handleDelUsers(decoded, out, nickname, conn);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -211,6 +214,19 @@ public class ClientHandler {
         srvMessagePacket.setMessaggio(messageRequest.getMessaggio());
 
         ClientRegistry.sendTo(messageRequest.getNickDestinatario(), srvMessagePacket.getSrvMessagePacket());
+    }
+
+    // ------------------------------------------------------------------------
+    // DEL_USERS - cancella un netfriend
+    // ------------------------------------------------------------------------
+    private static void handleDelUsers(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        List<String> netFriends = UtilsProtocol.getReqUsers(decoded);
+        logger.debug("REQ_DEL ricevuto, netFriends: " + netFriends);
+
+        NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
+        netFriendsDAO.deleteNetFriends(nickname,netFriends);
     }
 
     // -------------------------------------------------------------------------
