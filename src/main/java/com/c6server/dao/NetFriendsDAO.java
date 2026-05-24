@@ -76,6 +76,33 @@ public class NetFriendsDAO {
         }
     }
 
+    public List<String> getNetFriendsToNotify(String nickname) throws SQLException {
+        String sql = "SELECT n.user_nickname FROM netfriends n " +
+                "JOIN users u ON u.nickname = n.user_nickname " +
+                "WHERE n.netfriend = ? AND u.online = 1;";
+        List<String> users = new ArrayList<>();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nickname);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(rs.getString("user_nickname"));
+                }
+            }
+        }
+        return users;
+    }
+
+    public void updateStatus(String nickname, boolean online) throws SQLException {
+        String sql = "UPDATE users SET online = ? WHERE nickname = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setBoolean(1, online);
+            pstmt.setString(2, nickname);
+            pstmt.executeUpdate();
+            System.out.println("Utente " + nickname + " online: " + online);
+        }
+    }
+
     public void deleteAllNetFriends(String userNickname) throws SQLException {
         String sql = "DELETE FROM netfriends WHERE user_nickname = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

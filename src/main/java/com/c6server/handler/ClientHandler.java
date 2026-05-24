@@ -49,6 +49,8 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.LOGIN.getCode()) {
                     nickname = handleLogin(decoded, key, out, conn);
                     ClientRegistry.register(nickname, out);
+
+                    handleNewUsers(decoded, out, nickname, conn);
                 }
                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
                     handleReqPuls(decoded, out);
@@ -227,6 +229,27 @@ public class ClientHandler {
 
         NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
         netFriendsDAO.deleteNetFriends(nickname,netFriends);
+    }
+
+    // ------------------------------------------------------------------------
+    // NEW_USERS - cancella un netfriend
+    // ------------------------------------------------------------------------
+    private static void handleNewUsers(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        // prelevo tutti i netFriend che hanno "nickname" come amico
+        NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
+        netFriendsDAO.updateStatus(nickname,true);
+        List<String> netFriendsToNotify = netFriendsDAO.getNetFriendsToNotify(nickname);
+
+        NewUserPacket newUserPacket = new NewUserPacket();
+        newUserPacket.setCount(0);
+        newUserPacket.setNickname(nickname);
+
+        // inviare il pacchetto NewUserPacket ai netFriend
+        for(String netFriend : netFriendsToNotify) {
+            ClientRegistry.sendTo(netFriend, newUserPacket.getNewUserPacket());
+        }
     }
 
     // -------------------------------------------------------------------------
