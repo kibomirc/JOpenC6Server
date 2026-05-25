@@ -11,18 +11,23 @@ L'obiettivo principale del progetto è replicare e supportare accuratamente le s
 
 ## Funzionalità Supportate
 
+## Funzionalità Supportate
+
 Attualmente il server implementa i seguenti componenti core del protocollo:
 
-* Sicurezza & Autenticazione**
-    * Codifica dei pacchetti nativi del protocollo C6.
-    * Gestione e crittografia dell'handshake per Nickname e Password.
-* Flusso di Connessione**
-    * Gestione delle richieste di tipo `infoserverlogin`.
-    * Invio del messaggio di benvenuto iniziale (`welcomeMessage` / MOTD).
-* Sincronizzazione & Stato**
-    * Gestione dei pulsanti e dell'interfaccia: elaborazione delle richieste `reqPuls` e invio dei dati `sendPuls` per l'aggiornamento dei componenti grafici.
-    * Gestione della lista contatti: elaborazione della richiesta di elenco (`reqUsers`) e distribuzione degli utenti connessi (`sendUsers`) in tempo reale.
-
+* **Sicurezza & Autenticazione**
+  * Codifica dei pacchetti nativi del protocollo C6.
+  * Gestione e crittografia dell'handshake per Nickname e Password.
+* **Flusso di Connessione**
+  * Gestione delle richieste di tipo `infoserverlogin`.
+  * Invio del messaggio di benvenuto iniziale (`welcomeMessage` / MOTD).
+* **Messaggistica**
+  * Invio e ricezione di messaggi privati tra utenti tramite `SRV_MESSAGE`.
+* **Sincronizzazione & Stato**
+  * Gestione dei pulsanti e dell'interfaccia: elaborazione delle richieste `reqPuls` e invio dei dati `sendPuls` per l'aggiornamento dei componenti grafici.
+  * Gestione della lista contatti: elaborazione della richiesta di elenco (`reqUsers`) e distribuzione degli utenti connessi (`sendUsers`) in tempo reale.
+  * Notifica di nuovo utente connesso (`newUser`) per aggiornare i netfriend online in tempo reale.
+  * Notifica di disconnessione utente (`EXIT_USER`) per aggiornare i netfriend in tempo reale.
 ---
 
 ##  Architettura Tecnica
@@ -37,10 +42,14 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [] **Gestione status OFFLINE:** Bisogna aggiornare lo status online a 0 quando l'utente si disconnette o in caso di errore.
-
+- [] **Gestione CHNG_STATUS:** Comando per aggiornare il cambiamento dello stato del netFriend.
+- [] **Gestione PING:** Comando per controllare se la connessione dell'utente è ancora attiva.
+- [] **Gestione LOGIN_NOUSER:** Errore nel caso ci si colleghi con un nickname che non esiste.
+- [] **Gestione LOGIN_ERRPASS:** Errore nel caso si inserisca una password sbagliata.
+- [] **Gestione LOGIN_USERCONN :** Errore nel caso l' utente risulti già connesso.
+- [] **Gestione CLIENT_EXIT_OK:** Gestione scollegamento client da interfaccia.
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.
-Si ringrazia Alessio (BigAlex) Periloso per aver effettuato il reversing del protocollo.
+Si ringrazia Alessio (BiGAlex) Periloso per aver effettuato il reversing del protocollo.
 

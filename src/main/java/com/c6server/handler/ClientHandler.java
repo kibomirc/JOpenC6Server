@@ -28,8 +28,9 @@ public class ClientHandler {
     // Entry point — chiamato dal threadPool in C6ServerMain
     // -------------------------------------------------------------------------
 
-    public static void handle(Socket socket, Connection conn) {
+    public static void handle(Socket socket, Connection conn) throws SQLException {
         String nickname = null;
+        NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
         System.out.println("Nuova connessione da: " + socket.getInetAddress() + ":" + socket.getPort());
 
         try (Socket s = socket;
@@ -50,7 +51,7 @@ public class ClientHandler {
                     nickname = handleLogin(decoded, key, out, conn);
                     ClientRegistry.register(nickname, out);
 
-                    handleNewUsers(decoded, out, nickname, conn);
+                    handleNewUsers(nickname, conn);
                 }
                 if (cmdClient == C6EnumClient.REQ_PULS.getCode()) {
                     handleReqPuls(decoded, out);
@@ -64,12 +65,17 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.DEL_USERS.getCode()) {
                     handleDelUsers(decoded, out, nickname, conn);
                 }
+                if (cmdClient == C6EnumClient.CLIENT_REQ_EXIT.getCode()) {
+                    handleExitUser(nickname, conn);
+                }
             }
 
         } catch (IOException | SQLException e) {
             logger.error("Errore connessione client " + nickname + " — " + e.getMessage());
+            netFriendsDAO.updateStatus(nickname,false);
             ClientRegistry.unregister(nickname);
         } catch (NoSuchAlgorithmException e) {
+            netFriendsDAO.updateStatus(nickname,false);
             ClientRegistry.unregister(nickname);
             throw new RuntimeException(e);
         }
@@ -234,7 +240,7 @@ public class ClientHandler {
     // ------------------------------------------------------------------------
     // NEW_USERS - cancella un netfriend
     // ------------------------------------------------------------------------
-    private static void handleNewUsers(byte[] decoded, OutputStream out, String nickname, Connection conn)
+    private static void handleNewUsers(String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         // prelevo tutti i netFriend che hanno "nickname" come amico
@@ -249,6 +255,28 @@ public class ClientHandler {
         // inviare il pacchetto NewUserPacket ai netFriend
         for(String netFriend : netFriendsToNotify) {
             ClientRegistry.sendTo(netFriend, newUserPacket.getNewUserPacket());
+        }
+    }
+
+
+    // ------------------------------------------------------------------------
+    // EXIT_USERS - cancella un netfriend
+    // ------------------------------------------------------------------------
+    private static void handleExitUser(String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        // prelevo tutti i netFriend che hanno "nickname" come amico
+        NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
+        netFriendsDAO.updateStatus(nickname,false);
+        List<String> netFriendsToNotify = netFriendsDAO.getNetFriendsToNotify(nickname);
+
+        ExitUserPacket exitUserPacket = new ExitUserPacket();
+        exitUserPacket.setCount(0);
+        exitUserPacket.setNickname(nickname);
+
+        // inviare il pacchetto NewUserPacket ai netFriend
+        for(String netFriend : netFriendsToNotify) {
+            ClientRegistry.sendTo(netFriend, exitUserPacket.getExitUserPacket());
         }
     }
 
