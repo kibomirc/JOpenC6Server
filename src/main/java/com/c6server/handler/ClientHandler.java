@@ -7,6 +7,7 @@ import com.c6server.dao.UserDAO;
 import com.c6server.model.LoginEntity;
 import com.c6server.model.MessageRequest;
 import com.c6server.packet.*;
+import com.c6server.utils.PingManagerUtils;
 import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,7 @@ public class ClientHandler {
     // Entry point — chiamato dal threadPool in C6ServerMain
     // -------------------------------------------------------------------------
 
-    public static void handle(Socket socket, Connection conn) throws SQLException {
+    public static void handle(Socket socket, Connection conn) throws SQLException, IOException {
         String nickname = null;
         NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
         System.out.println("Nuova connessione da: " + socket.getInetAddress() + ":" + socket.getPort());
@@ -49,7 +50,14 @@ public class ClientHandler {
 
                 if (cmdClient == C6EnumClient.LOGIN.getCode()) {
                     nickname = handleLogin(decoded, key, out, conn);
-                    ClientRegistry.register(nickname, out);
+
+                    if (nickname == null) {
+                        Thread.sleep(500);
+                        break;
+                    }
+
+                    ClientRegistry.register(nickname, socket);
+                    PingManagerUtils.getInstance().onClientConnected(nickname);
 
                     handleNewUsers(nickname, conn);
                 }
@@ -68,15 +76,22 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.CLIENT_REQ_EXIT.getCode()) {
                     handleExitUser(nickname, conn);
                 }
+                if (cmdClient == C6EnumClient.PONG.getCode()) {
+                    PingManagerUtils.getInstance().onPongReceived(nickname);
+                }
             }
 
         } catch (IOException | SQLException e) {
             logger.error("Errore connessione client " + nickname + " — " + e.getMessage());
             netFriendsDAO.updateStatus(nickname,false);
             ClientRegistry.unregister(nickname);
-        } catch (NoSuchAlgorithmException e) {
+
+            PingManagerUtils.getInstance().onClientDisconnected(nickname);
+        } catch (InterruptedException | NoSuchAlgorithmException e) {
             netFriendsDAO.updateStatus(nickname,false);
             ClientRegistry.unregister(nickname);
+
+            PingManagerUtils.getInstance().onClientDisconnected(nickname);
             throw new RuntimeException(e);
         }
     }
@@ -112,23 +127,52 @@ public class ClientHandler {
         LoginEntity loginEntity = UtilsProtocol.loginData(decoded);
 
         boolean nickCheck = UtilsProtocol.checkC6Control(key, loginEntity.getNick(), loginEntity.getNickEncoded(), false);
+
         if (!nickCheck) {
             logger.warn("Spoofing rilevato, connessione chiusa.");
             throw new IOException("Spoofing rilevato");
         }
 
+        // Check se il nick esiste
+        UserDAO userDAO = new UserDAO(conn);
+
+        if (!userDAO.exists(loginEntity.getNick())) {
+            LoginNoUserPacket loginNoUserPacket = new LoginNoUserPacket();
+            loginNoUserPacket.setCount(0);
+
+            out.write(loginNoUserPacket.getLoginNoUserPacket());
+            out.flush();
+
+            logger.warn("L'Utente non esiste: " + loginEntity.getNick());
+            return null;
+        }
+
+        // check utente già connesso
+        if(userDAO.getStatusOnline(loginEntity.getNick())) {
+            LoginUserConnPacket loginUserConnPacket = new LoginUserConnPacket();
+            loginUserConnPacket.setCount(0);
+
+            out.write(loginUserConnPacket.getLoginUserConnPacket());
+            out.flush();
+
+            logger.warn("Utente già connesso! : " + loginEntity.getNick());
+            return null;
+
+        }
+
         // TODO: sostituire "password" con lettura da SQLite quando implementata la registrazione
         boolean passCheck = UtilsProtocol.checkC6Control(key, "password", loginEntity.getPassEncoded(), true);
         if (!passCheck) {
+            LoginErrorPassPacket loginErrorPassPacket = new LoginErrorPassPacket();
+            loginErrorPassPacket.setCount(0);
+
+            out.write(loginErrorPassPacket.getLoginErrorPassPacket());
+            out.flush();
+
             logger.warn("Password sbagliata per: " + loginEntity.getNick());
-            throw new IOException("Password sbagliata");
+            return null;
         }
 
-        UserDAO userDAO = new UserDAO(conn);
-        if (!userDAO.exists(loginEntity.getNick())) {
-            // TODO: inviare messaggio di errore
-            throw new IOException("Utente non esiste: " + loginEntity.getNick());
-        }
 
         logger.info("Login riuscito per: " + loginEntity.getNick());
 
@@ -278,6 +322,8 @@ public class ClientHandler {
         for(String netFriend : netFriendsToNotify) {
             ClientRegistry.sendTo(netFriend, exitUserPacket.getExitUserPacket());
         }
+
+        PingManagerUtils.getInstance().onClientDisconnected(nickname);
     }
 
     // -------------------------------------------------------------------------

@@ -19,7 +19,6 @@ public class UserDAO {
         }
     }
 
-    // READ (Singolo): Cerca un utente per nickname
     public boolean exists(String nickname) throws SQLException {
         String sql = "SELECT 1 FROM users WHERE nickname = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -62,5 +61,19 @@ public class UserDAO {
             System.out.println("Utente rimosso (e lista associata eliminata): " + nickname);
         }
     }
+
+    public boolean getStatusOnline(String nickname) throws SQLException {
+        String sql = "SELECT online FROM users WHERE nickname = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nickname);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("online");
+                }
+                throw new SQLException("Utente non trovato: " + nickname);
+            }
+        }
+    }
+
 }
 

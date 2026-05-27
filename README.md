@@ -42,12 +42,12 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [] **Gestione CHNG_STATUS:** Comando per aggiornare il cambiamento dello stato del netFriend.
-- [] **Gestione PING:** Comando per controllare se la connessione dell'utente è ancora attiva.
-- [] **Gestione LOGIN_NOUSER:** Errore nel caso ci si colleghi con un nickname che non esiste.
-- [] **Gestione LOGIN_ERRPASS:** Errore nel caso si inserisca una password sbagliata.
-- [] **Gestione LOGIN_USERCONN :** Errore nel caso l' utente risulti già connesso.
-- [] **Gestione CLIENT_EXIT_OK:** Gestione scollegamento client da interfaccia.
+- [X] **Gestione PING:** Comando per controllare se la connessione dell'utente è ancora attiva.
+- [X] **Gestione LOGIN_NOUSER:** Errore nel caso ci si colleghi con un nickname che non esiste.
+- [X] **Gestione LOGIN_ERRPASS:** Errore nel caso si inserisca una password sbagliata.
+- [X] **Gestione LOGIN_USERCONN :** Errore nel caso l' utente risulti già connesso.
+- [X] **Gestione CLIENT_EXIT_OK:** Gestione scollegamento client da interfaccia.
+- [X] **Gestione CHECK_PASSWORD:** Gestione controllo password da db con hash
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.

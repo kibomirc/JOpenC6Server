@@ -3,6 +3,7 @@ package com.c6server;
 import com.c6server.dao.DatabaseConnection;
 import com.c6server.handler.ClientHandler;
 import com.c6server.utils.HttpServerUtils;
+import com.c6server.utils.PingManagerUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +23,7 @@ public class C6ServerMain {
 
     public static void main(String[] args) throws IOException, SQLException {
 
+        PingManagerUtils.getInstance().start();
 
         threadPool.submit(() -> {
             try {
@@ -41,8 +43,8 @@ public class C6ServerMain {
                         try {
                             Connection clientConn = DatabaseConnection.getConnection();
                             ClientHandler.handle(clientSocket, clientConn);
-                        } catch (SQLException e) {
-                            logger.error("Errore connessione DB", e);
+                        } catch (SQLException | IOException e) {
+                            logger.error("Errore connessione!", e);
                         }
                     });
                 }

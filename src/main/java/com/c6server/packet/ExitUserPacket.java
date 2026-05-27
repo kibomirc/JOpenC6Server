@@ -69,7 +69,7 @@ public class ExitUserPacket {
 
         byte[] exitUserPacket = exitUserPacketComposit.toByteArray();
 
-        System.out.println("LOG PACCHETTO COMPLETO NEW USER:");
+        System.out.println("LOG PACCHETTO COMPLETO EXIT USER PACKET:");
         System.out.println("Server Command: " + java.util.HexFormat.ofDelimiter(" ").formatHex(SERVER_COMMAND));
         System.out.println("Command Count: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getCount()));
         System.out.println("Length (Total): " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLength()));
