@@ -160,8 +160,7 @@ public class ClientHandler {
 
         }
 
-        // TODO: sostituire "password" con lettura da SQLite quando implementata la registrazione
-        boolean passCheck = UtilsProtocol.checkC6Control(key, "password", loginEntity.getPassEncoded(), true);
+        boolean passCheck = UtilsProtocol.checkC6Control(key, userDAO.getPassword(loginEntity.getNick()), loginEntity.getPassEncoded(), true);
         if (!passCheck) {
             LoginErrorPassPacket loginErrorPassPacket = new LoginErrorPassPacket();
             loginErrorPassPacket.setCount(0);

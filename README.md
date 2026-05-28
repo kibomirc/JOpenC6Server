@@ -34,7 +34,7 @@ Attualmente il server implementa i seguenti componenti core del protocollo:
 
 Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 * **Core Engine:** Sviluppato in Java con architettura multi-thread orientata agli oggetti.
-* **Storage:** File database **SQLite**, interfacciato tramite driver JDBC standard e ottimizzato con chiamate native via **JNI** per garantire latenze minime in produzione.
+* **Storage:** File database **SQLite**, interfacciato tramite driver JDBC standard
 
 ---
 
@@ -47,7 +47,7 @@ Le attività attualmente pianificate includono:
 - [X] **Gestione LOGIN_ERRPASS:** Errore nel caso si inserisca una password sbagliata.
 - [X] **Gestione LOGIN_USERCONN :** Errore nel caso l' utente risulti già connesso.
 - [X] **Gestione CLIENT_EXIT_OK:** Gestione scollegamento client da interfaccia.
-- [X] **Gestione CHECK_PASSWORD:** Gestione controllo password da db con hash
+- [X] **Gestione CHECK_PASSWORD:** Gestione controllo password da db
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.

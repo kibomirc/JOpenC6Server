@@ -10,12 +10,12 @@ public class UserDAO {
     }
 
     // CREATE: Inserisce un nuovo utente
-    public void create(String nickname) throws SQLException {
-        String sql = "INSERT INTO users (nickname) VALUES (?);";
+    public void create(String nickname, String password) throws SQLException {
+        String sql = "INSERT INTO users (nickname, password) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, nickname);
+            pstmt.setString(2, password);
             pstmt.executeUpdate();
-            System.out.println("Utente creato: " + nickname);
         }
     }
 
@@ -69,6 +69,19 @@ public class UserDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getBoolean("online");
+                }
+                throw new SQLException("Utente non trovato: " + nickname);
+            }
+        }
+    }
+
+    public String getPassword(String nickname) throws SQLException {
+        String sql = "SELECT password FROM users WHERE nickname = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nickname);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("password");
                 }
                 throw new SQLException("Utente non trovato: " + nickname);
             }
