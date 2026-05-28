@@ -7,7 +7,7 @@ import java.util.Base64;
 
 public class AESUtils {
 
-    private static final String SECRET_KEY = "JOpenC6Server!!!"; // TODO ATTENZIONE CAMBIARE!!! IMPORTANTE
+    private static final String SECRET_KEY = "JavaOpenC6Server"; // TODO ATTENZIONE CAMBIARE!!! IMPORTANTE
 
     public static String encrypt(String plainText) {
         try {
@@ -29,7 +29,7 @@ public class AESUtils {
             byte[] decoded = Base64.getDecoder().decode(encryptedText);
             return new String(cipher.doFinal(decoded));
         } catch (Exception e) {
-            throw new RuntimeException("Errore decifratura AES", e);
+            return null;
         }
     }
 }
