@@ -5,6 +5,7 @@ import com.c6server.packet.InfoLoginPacket;
 import com.c6server.model.LoginEntity;
 import com.c6server.packet.SendPulsPacket;
 import com.c6server.packet.WelcomeEntityPacket;
+import com.c6server.utils.AESUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -177,6 +178,12 @@ public class C6ServerMainTest
             System.out.printf("%02X ", b);
         }
         System.out.println();
+    }
+
+    @Test
+    void testCreatePassword() {
+        String passwordEncode = AESUtils.encrypt("ivan");
+        System.out.println(passwordEncode);
     }
 
 }

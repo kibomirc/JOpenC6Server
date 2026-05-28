@@ -1,5 +1,7 @@
 package com.c6server.dao;
 
+import com.c6server.utils.AESUtils;
+
 import java.sql.*;
 
 public class UserDAO {
@@ -14,7 +16,7 @@ public class UserDAO {
         String sql = "INSERT INTO users (nickname, password) VALUES (?, ?);";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, nickname);
-            pstmt.setString(2, password);
+            pstmt.setString(2, AESUtils.encrypt(password));
             pstmt.executeUpdate();
         }
     }

@@ -7,6 +7,7 @@ import com.c6server.dao.UserDAO;
 import com.c6server.model.LoginEntity;
 import com.c6server.model.MessageRequest;
 import com.c6server.packet.*;
+import com.c6server.utils.AESUtils;
 import com.c6server.utils.PingManagerUtils;
 import com.c6server.utils.UtilsProtocol;
 import org.apache.logging.log4j.LogManager;
@@ -159,8 +160,8 @@ public class ClientHandler {
             return null;
 
         }
-
-        boolean passCheck = UtilsProtocol.checkC6Control(key, userDAO.getPassword(loginEntity.getNick()), loginEntity.getPassEncoded(), true);
+        // Devo per forza salvare in chiaro la password su db perchè la key cambia e quindi anche la codifica
+        boolean passCheck = UtilsProtocol.checkC6Control(key, AESUtils.decrypt(userDAO.getPassword(loginEntity.getNick())), loginEntity.getPassEncoded(), true);
         if (!passCheck) {
             LoginErrorPassPacket loginErrorPassPacket = new LoginErrorPassPacket();
             loginErrorPassPacket.setCount(0);
