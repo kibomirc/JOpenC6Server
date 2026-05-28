@@ -12,7 +12,8 @@ public enum C6EnumClient {
     PONG(0x0B),
     NICK(0x10),
     QUIT(0x18),
-    VERSION(0x19);
+    VERSION(0x19),
+    REQ_ROOM_LIST(0x24);
 
     private final int code;
 

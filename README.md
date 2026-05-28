@@ -42,12 +42,16 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [X] **Gestione PING:** Comando per controllare se la connessione dell'utente è ancora attiva.
-- [X] **Gestione LOGIN_NOUSER:** Errore nel caso ci si colleghi con un nickname che non esiste.
-- [X] **Gestione LOGIN_ERRPASS:** Errore nel caso si inserisca una password sbagliata.
-- [X] **Gestione LOGIN_USERCONN :** Errore nel caso l' utente risulti già connesso.
-- [X] **Gestione CLIENT_EXIT_OK:** Gestione scollegamento client da interfaccia.
-- [X] **Gestione CHECK_PASSWORD:** Gestione controllo password da db
+- [] **Invio RoomList :** invio delle roomList.
+- [] **Gestione Room :** gestire join e part.
+- [] **Gestione Messaggi in Room :**.
+- [] **Gestione Room NetFriend pubbliche:**
+- [] **Gestione Room NetFriend private:**
+- [] **Gestione invito in stanza:**
+- [] **Gestione profilo stanza:**
+- [] **Gestione profilo utente:**
+- [] **Ricerca NetFriend:**
+- [] **Servizio Rest con pagina per la registrazione:**
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.

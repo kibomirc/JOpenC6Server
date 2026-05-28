@@ -80,6 +80,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.PONG.getCode()) {
                     PingManagerUtils.getInstance().onPongReceived(nickname);
                 }
+                if (cmdClient == C6EnumClient.REQ_ROOM_LIST.getCode()) {
+                    handleReqRoomList(nickname,conn);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -324,6 +327,17 @@ public class ClientHandler {
         }
 
         PingManagerUtils.getInstance().onClientDisconnected(nickname);
+    }
+
+
+    // ------------------------------------------------------------------------
+    // REQ_ROOM_LIST - preleva dal db le room list da inviare al client
+    // ------------------------------------------------------------------------
+    private static void handleReqRoomList(String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("L' Utente sta chiedendo le stanze");
+
     }
 
     // -------------------------------------------------------------------------
