@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -81,7 +80,7 @@ public class ClientHandler {
                     PingManagerUtils.getInstance().onPongReceived(nickname);
                 }
                 if (cmdClient == C6EnumClient.REQ_ROOM_LIST.getCode()) {
-                    handleReqRoomList(nickname,conn);
+                    handleReqRoomList(nickname,conn,out);
                 }
             }
 
@@ -333,10 +332,18 @@ public class ClientHandler {
     // ------------------------------------------------------------------------
     // REQ_ROOM_LIST - preleva dal db le room list da inviare al client
     // ------------------------------------------------------------------------
-    private static void handleReqRoomList(String nickname, Connection conn)
+    private static void handleReqRoomList(String nickname, Connection conn, OutputStream out)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("L' Utente sta chiedendo le stanze");
+
+        SendRoomPacket sendRoomPacket = new SendRoomPacket();
+        sendRoomPacket.setCount(0);
+        sendRoomPacket.setNumRooms(1);
+        sendRoomPacket.addRoom("Ti voglio bene BiGAlex");
+
+        out.write(sendRoomPacket.getSendRoom());
+        out.flush();
 
     }
 
