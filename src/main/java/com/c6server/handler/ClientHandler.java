@@ -85,6 +85,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.ENTER_ROOM.getCode()) {
                     handleEnterRoom(nickname, conn, out);
                 }
+                if (cmdClient == C6EnumClient.MESSAGE_ROOM.getCode()) {
+                    handleMessageRoom(decoded,nickname, conn, out);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -363,7 +366,7 @@ public class ClientHandler {
 
         EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
         enterRoomPacket.setCount(0);
-        enterRoomPacket.addRoom("JOpenC6Server",4,List.of("ivan","kibo","jinko","b1galex"));
+        enterRoomPacket.addRoom("JOpenC6Server",3,List.of("ivan","kibo","bigalex"));
 
         out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
@@ -378,6 +381,28 @@ public class ClientHandler {
         out.write(notifyRoomPacket.getNotifyRoomPacket());
         out.flush();
 
+    }
+
+
+    // -------------------------------------------------------------------------
+    // MESSAGE_ROOM — intercetta i messaggi inviati in room
+    // -------------------------------------------------------------------------
+
+    private static void handleMessageRoom(byte[] decoded,String nickname, Connection conn, OutputStream out)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("L utente " + nickname + " ha inviato un messaggio nella stanza!");
+
+        //TODO CABLIAMO IL MESSAGGIO IN STANZA E INDIRIZIAMOLO A BIGALEX
+
+        MessageRoomPacket messageRoomPacket = new MessageRoomPacket();
+        messageRoomPacket.setCount(0);
+        messageRoomPacket.setNicknameMittente("ivan");
+        messageRoomPacket.setRoomDestinazione("JOpenC6Server");
+        messageRoomPacket.setStile(new byte[]{ 0x00, 0x02 });
+        messageRoomPacket.setMessaggio("Funzionaaaaa");
+
+        ClientRegistry.sendTo("bigalex", messageRoomPacket.getMessageRoomPacket());
     }
 
     // -------------------------------------------------------------------------

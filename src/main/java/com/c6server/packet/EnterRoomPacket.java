@@ -9,8 +9,6 @@ import java.util.List;
 
 import static com.c6server.packet.InfoLoginPacket.concatBytes;
 
-// TODO deve essere modificato per gestire più room lo faccio dopo IMPORTANTE!
-// TODO iniziamo aggiungendo la stanza dei netfriend
 public class EnterRoomPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x32 };
     private final byte[] UNKNOWBYTE_1 = new byte[] { 0x03 };
