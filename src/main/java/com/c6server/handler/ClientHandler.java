@@ -342,9 +342,9 @@ public class ClientHandler {
 
         SendRoomPacket sendRoomPacket = new SendRoomPacket();
         sendRoomPacket.setCount(0);
-        sendRoomPacket.setNumRooms(1);
-        sendRoomPacket.addRoom("JOpenC6Server");
-
+        sendRoomPacket.addRoom("JOpenC6Server",100);
+        sendRoomPacket.addRoom("Amici",10);
+        //sendRoomPacket.addNetFriendRoom("stanza privata!");
         out.write(sendRoomPacket.getSendRoom());
         out.flush();
 

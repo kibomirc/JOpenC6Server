@@ -7,19 +7,32 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+// TODO aggiungiamo la stanza dei netfriend
 
 public class SendRoomPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x36 };
-    private final byte[] UNKNOWBYTE_1 = new byte[] { 0x13, 0x07, 0x0B };
+    private final byte[] UNKNOWBYTE_PUBLIC_ROOM = new byte[] { 0x13, 0x07, 0x0B };
+    private final byte[] UNKNOWBYTE_NETFRIENDS_ROOM = new byte[] { 0x44, 0x07, 0x0B };
     private final byte[] UNKNOWBYTE_2 = new byte[] { 0x00, 0x00 };
 
     private Integer count;
     private Integer numRooms; // 2 byte
 
+
     private List<Room> rooms = new ArrayList<>();
+    private List<Room> netFriendRooms = new ArrayList<>();
 
     public void setCount(Integer count) {
         this.count = count;
+    }
+
+
+    public byte[] getNumRooms() {
+        int total = rooms.size() + netFriendRooms.size();
+        byte[] value = new byte[2];
+        value[0] = (byte) ((total >> 8) & 0xFF);
+        value[1] = (byte) (total & 0xFF);
+        return value;
     }
 
     public byte[] getCount() {
@@ -34,19 +47,12 @@ public class SendRoomPacket {
         return bytes;
     }
 
-    public void addRoom(String room) {
-        this.rooms.add(new SendRoomPacket.Room(room));
+    public void addRoom(String room, int numUsers) {
+        this.rooms.add(new Room(room, numUsers));
     }
 
-    public byte[] getNumRooms() {
-        byte[] value = new byte[2];
-        value[0] = (byte) ((this.numRooms >> 8) & 0xFF);
-        value[1] = (byte) (this.numRooms & 0xFF);
-        return value;
-    }
-
-    public void setNumRooms(Integer numRooms) {
-        this.numRooms = numRooms;
+    public void addNetFriendRoom(String room, int numUsers) {
+        this.netFriendRooms.add(new Room(room, numUsers));
     }
 
     public int getLengthWithRooms() {
@@ -55,6 +61,12 @@ public class SendRoomPacket {
             total += 1 + room.nomeRoom.getBytes(StandardCharsets.ISO_8859_1).length; // 1 byte lunghezza + nome
             total += 5; // separatore [count] [UNKNOWBYTE_1]
         }
+
+        for (Room netFriendroom : netFriendRooms) {
+            total += 1 + netFriendroom.nomeRoom.getBytes(StandardCharsets.ISO_8859_1).length; // 1 byte lunghezza + nome
+            total += 5; // separatore [count] [UNKNOWBYTE_1]
+        }
+
         total += 4; // 2 * UNKNOWBYTE_2
         return total;
     }
@@ -81,8 +93,13 @@ public class SendRoomPacket {
         sendRoomsComposit.write(getNumRooms());
         for (Room room : rooms) {
             sendRoomsComposit.write(room.getLengthWithRoom());
-            sendRoomsComposit.write(getCount());
-            sendRoomsComposit.write(UNKNOWBYTE_1);
+            sendRoomsComposit.write(room.getNumUsers());
+            sendRoomsComposit.write(UNKNOWBYTE_PUBLIC_ROOM);
+        }
+        for (Room room : netFriendRooms) {
+            sendRoomsComposit.write(room.getLengthWithRoom());
+            sendRoomsComposit.write(room.getNumUsers());
+            sendRoomsComposit.write(UNKNOWBYTE_NETFRIENDS_ROOM);
         }
         sendRoomsComposit.write(UNKNOWBYTE_2);
 
@@ -101,9 +118,11 @@ public class SendRoomPacket {
 
     public static class Room {
         String nomeRoom;
+        int numUsers;
 
-        public Room(String nomeRoom) {
+        public Room(String nomeRoom, int numUsers) {
             this.nomeRoom = nomeRoom;
+            this.numUsers = numUsers;
         }
 
         public byte[] getLengthWithRoom() {
@@ -112,6 +131,13 @@ public class SendRoomPacket {
             result[0] = (byte) nameBytes.length;
             System.arraycopy(nameBytes, 0, result, 1, nameBytes.length);
             return result;
+        }
+
+        public byte[] getNumUsers() {
+            byte[] value = new byte[2];
+            value[0] = (byte) ((numUsers >> 8) & 0xFF);
+            value[1] = (byte) (numUsers & 0xFF);
+            return value;
         }
     }
 }
