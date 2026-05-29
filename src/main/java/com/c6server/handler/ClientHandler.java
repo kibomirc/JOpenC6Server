@@ -82,6 +82,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.REQ_ROOM_LIST.getCode()) {
                     handleReqRoomList(nickname,conn,out);
                 }
+                if (cmdClient == C6EnumClient.ENTER_ROOM.getCode()) {
+                    handleEnterRoom(nickname, conn, out);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -340,9 +343,30 @@ public class ClientHandler {
         SendRoomPacket sendRoomPacket = new SendRoomPacket();
         sendRoomPacket.setCount(0);
         sendRoomPacket.setNumRooms(1);
-        sendRoomPacket.addRoom("Ti voglio bene BiGAlex");
+        sendRoomPacket.addRoom("JOpenC6Server");
 
         out.write(sendRoomPacket.getSendRoom());
+        out.flush();
+
+    }
+
+    // ------------------------------------------------------------------------
+    // ENTER_ROOM - preleva dal db le room list da inviare al client
+    // ------------------------------------------------------------------------
+    private static void handleEnterRoom(String nickname, Connection conn, OutputStream out)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("L' Utente vuole entrare in una stanza");
+
+        // devo estrapolare il nome della stanza
+        // simuliamo che entro on JOpenC6Server
+        EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
+        enterRoomPacket.setCount(0);
+        enterRoomPacket.setNumUtenti(1);
+        enterRoomPacket.setRoom("JOpenC6Server");
+        enterRoomPacket.setNickname(nickname);
+
+        out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
 
     }
