@@ -362,8 +362,7 @@ public class ClientHandler {
         // simuliamo che entro on JOpenC6Server
         EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
         enterRoomPacket.setCount(0);
-        enterRoomPacket.setNumUtenti(1);
-        enterRoomPacket.setRoom("JOpenC6Server");
+        enterRoomPacket.addRoom("JOpenC6Server",3);
         enterRoomPacket.setNickname(nickname);
 
         out.write(enterRoomPacket.getEnterRoomPacket());
