@@ -55,7 +55,7 @@ public class SendRoomPacket {
         this.netFriendRooms.add(new Room(room, numUsers));
     }
 
-    public int getLengthWithRooms() {
+    public int getLengthWithRoomsAndNetFriendsRoom() {
         int total = 0;
         for (Room room : rooms) {
             total += 1 + room.nomeRoom.getBytes(StandardCharsets.ISO_8859_1).length; // 1 byte lunghezza + nome
@@ -73,9 +73,9 @@ public class SendRoomPacket {
 
     public byte[] getLength() {
         int lenNumRooms = getNumRooms().length;
-        int lenWithRoom = this.getLengthWithRooms();
+        int lenWithRoomAndNetFriendsRoom = this.getLengthWithRoomsAndNetFriendsRoom();
 
-        int totalLen = lenNumRooms + lenWithRoom;
+        int totalLen = lenNumRooms + lenWithRoomAndNetFriendsRoom;
 
         byte[] totalLenBytes = new byte[2];
         totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);

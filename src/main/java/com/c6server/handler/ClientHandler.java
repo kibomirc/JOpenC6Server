@@ -344,7 +344,7 @@ public class ClientHandler {
         sendRoomPacket.setCount(0);
         sendRoomPacket.addRoom("JOpenC6Server",100);
         sendRoomPacket.addRoom("Amici",10);
-        //sendRoomPacket.addNetFriendRoom("stanza privata!");
+        sendRoomPacket.addNetFriendRoom("stanza privata!",4);
         out.write(sendRoomPacket.getSendRoom());
         out.flush();
 
