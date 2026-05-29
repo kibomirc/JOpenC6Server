@@ -369,6 +369,16 @@ public class ClientHandler {
         out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
 
+
+        // notifica utente chat
+        NotifyRoomPacket notifyRoomPacket = new NotifyRoomPacket();
+        notifyRoomPacket.setRoom("JOpenC6Server");
+        notifyRoomPacket.setCount(0);
+        notifyRoomPacket.setNickname(nickname);
+
+        out.write(notifyRoomPacket.getNotifyRoomPacket());
+        out.flush();
+
     }
 
     // -------------------------------------------------------------------------
