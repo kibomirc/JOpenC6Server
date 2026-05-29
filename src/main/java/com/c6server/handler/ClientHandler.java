@@ -360,10 +360,10 @@ public class ClientHandler {
 
         // devo estrapolare il nome della stanza
         // simuliamo che entro on JOpenC6Server
+
         EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
         enterRoomPacket.setCount(0);
-        enterRoomPacket.addRoom("JOpenC6Server",3);
-        enterRoomPacket.setNickname(nickname);
+        enterRoomPacket.addRoom("JOpenC6Server",4,List.of("ivan","kibo","jinko","b1galex"));
 
         out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
