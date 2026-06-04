@@ -15,6 +15,7 @@ public enum C6EnumClient {
     VERSION(0x19),
     REQ_ROOM_LIST(0x24),
     ENTER_ROOM(0x21),
+    EXIT_ROOM(0x22),
     MESSAGE_ROOM(0x20);
 
     private final int code;

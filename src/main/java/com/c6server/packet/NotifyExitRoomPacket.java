@@ -6,9 +6,8 @@ import java.nio.charset.StandardCharsets;
 
 import static com.c6server.packet.InfoLoginPacket.concatBytes;
 
-public class NotifyRoomPacket {
-
-    private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x33 };
+public class NotifyExitRoomPacket {
+    private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x34 };
     private Integer count;
     private String room;
     private String nickname;
@@ -82,7 +81,7 @@ public class NotifyRoomPacket {
 
         byte[] notifyRoomPacket = notifyRoomPacketComposit.toByteArray();
 
-        System.out.println("LOG PACCHETTO COMPLETO NOTIFY ROOM PACKET:");
+        System.out.println("LOG PACCHETTO COMPLETO NOTIFY EXIT ROOM PACKET:");
         System.out.println("Server Command: " + java.util.HexFormat.ofDelimiter(" ").formatHex(SERVER_COMMAND));
         System.out.println("Command Count: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getCount()));
         System.out.println("Length (Total): " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLength()));

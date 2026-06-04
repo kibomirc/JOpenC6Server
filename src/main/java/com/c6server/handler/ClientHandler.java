@@ -88,6 +88,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.MESSAGE_ROOM.getCode()) {
                     handleMessageRoom(decoded,nickname, conn, out);
                 }
+                if (cmdClient == C6EnumClient.EXIT_ROOM.getCode()) {
+                    handleExitRoom(nickname, conn, out);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -366,20 +369,19 @@ public class ClientHandler {
 
         EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
         enterRoomPacket.setCount(0);
-        enterRoomPacket.addRoom("JOpenC6Server",3,List.of("ivan","kibo","bigalex"));
+        enterRoomPacket.addRoom("JOpenC6Server",1,List.of("bigalex"));
+
+        // notifica utente chat
+        NotifyEnterRoomPacket notifyEnterRoomPacket = new NotifyEnterRoomPacket();
+        notifyEnterRoomPacket.setRoom("JOpenC6Server");
+        notifyEnterRoomPacket.setCount(0);
+        notifyEnterRoomPacket.setNickname("ivan");
+
 
         out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
 
-
-        // notifica utente chat
-        NotifyRoomPacket notifyRoomPacket = new NotifyRoomPacket();
-        notifyRoomPacket.setRoom("JOpenC6Server");
-        notifyRoomPacket.setCount(0);
-        notifyRoomPacket.setNickname(nickname);
-
-        out.write(notifyRoomPacket.getNotifyRoomPacket());
-        out.flush();
+        ClientRegistry.sendTo("bigalex", notifyEnterRoomPacket.getNotifyRoomPacket());
 
     }
 
@@ -403,6 +405,23 @@ public class ClientHandler {
         messageRoomPacket.setMessaggio("Funzionaaaaa");
 
         ClientRegistry.sendTo("bigalex", messageRoomPacket.getMessageRoomPacket());
+    }
+
+    // ------------------------------------------------------------------------
+    // EXIT_ROOM - Gestione
+    // ------------------------------------------------------------------------
+    private static void handleExitRoom(String nickname, Connection conn, OutputStream out)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("L' Utente è uscito dalla stanza");
+
+        NotifyExitRoomPacket notifyExitRoomPacket = new NotifyExitRoomPacket();
+        notifyExitRoomPacket.setCount(0);
+        notifyExitRoomPacket.setRoom("JOpenC6Server");
+        notifyExitRoomPacket.setNickname("ivan");
+
+        ClientRegistry.sendTo("bigalex", notifyExitRoomPacket.getNotifyRoomPacket());
+
     }
 
     // -------------------------------------------------------------------------
