@@ -91,6 +91,18 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.EXIT_ROOM.getCode()) {
                     handleExitRoom(nickname, conn, out);
                 }
+                if (cmdClient == C6EnumClient.PROFILE_ROOM.getCode()) {
+                    handleProfileRoom(decoded, out, nickname, conn);
+                }
+                if (cmdClient == C6EnumClient.PROFILE_USER.getCode()) {
+                    handleProfileUser(decoded, out, nickname, conn);
+                }
+                if (cmdClient == C6EnumClient.CREATE_ROOM.getCode()) {
+                    handleCreateRoom(decoded, out, nickname, conn);
+                }
+                if (cmdClient == C6EnumClient.REQ_SEARCH_NETFRIEND.getCode()) {
+                    handleReqSearchNetFriend(decoded, out, nickname, conn);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -421,6 +433,51 @@ public class ClientHandler {
         notifyExitRoomPacket.setNickname("ivan");
 
         ClientRegistry.sendTo("bigalex", notifyExitRoomPacket.getNotifyRoomPacket());
+
+    }
+
+
+    // -------------------------------------------------------------------------
+    // PROFILE_ROOM — salva la lista amici e risponde con gli utenti online
+    // -------------------------------------------------------------------------
+
+    private static void handleProfileRoom(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("Richiesta profilo stanza");
+
+    }
+
+    // -------------------------------------------------------------------------
+    // PROFILE_ROOM — restituisce il profilo della stanza
+    // -------------------------------------------------------------------------
+
+    private static void handleProfileUser(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("Richiesta profilo utente");
+
+    }
+
+    // -------------------------------------------------------------------------
+    // CREATE_ROOM — creazione room
+    // -------------------------------------------------------------------------
+
+    private static void handleCreateRoom(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+        // TODO nei data che avrò nel decode si dovrà vedere se la stanza è privata o meno e implementare le corrette logiche
+        System.out.println("Richiesta creazione stanza");
+
+    }
+
+    // -------------------------------------------------------------------------
+    // REQ_SEARCH_NETFRIEND — ricerca netFriends per profilo o e-mail
+    // -------------------------------------------------------------------------
+
+    private static void handleReqSearchNetFriend(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+        // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
+        System.out.println("Richiesta netfriend profilo");
 
     }
 

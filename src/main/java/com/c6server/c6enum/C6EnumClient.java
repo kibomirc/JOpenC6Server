@@ -5,17 +5,21 @@ public enum C6EnumClient {
     LOGIN(0x01),
     CLIENT_REQ_EXIT(0x02),    // logout
     REQ_PULS(0x0D),           // request button
+    REQ_SEARCH_NETFRIEND(0x0E),
     REQ_USERS(0x03),          // list connected users
     DEL_USERS(0x04),          // unlist connected users
     OL_MESSAGE(0x08),         // on line message
     CHNG_STATUS(0x0A),
     PONG(0x0B),
+    PROFILE_USER(0x0C),
     NICK(0x10),
     QUIT(0x18),
     VERSION(0x19),
     REQ_ROOM_LIST(0x24),
     ENTER_ROOM(0x21),
     EXIT_ROOM(0x22),
+    PROFILE_ROOM(0x26),
+    CREATE_ROOM(0x25),
     MESSAGE_ROOM(0x20);
 
     private final int code;
