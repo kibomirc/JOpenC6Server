@@ -1,6 +1,6 @@
 package com.c6server.packet;
 
-import com.c6server.utils.UtilsProtocol;
+import com.c6server.utils.ProtocolUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,8 +49,8 @@ public class SendPulsPacket {
     public byte[] getLengthButton() {
         int buttonLen = 0;
         for (Button b : buttons) {
-            buttonLen += UtilsProtocol.getLengthField(b.descr).length;
-            buttonLen += UtilsProtocol.getLengthField(b.link).length;
+            buttonLen += ProtocolUtils.getLengthField(b.descr).length;
+            buttonLen += ProtocolUtils.getLengthField(b.link).length;
         }
 
         byte[] totalLenBytes = new byte[2];
@@ -94,8 +94,8 @@ public class SendPulsPacket {
         sndPulsComposit.write(getLength());
         sndPulsComposit.write(getNumPuls());
         for (Button b : buttons) {
-            sndPulsComposit.write(UtilsProtocol.getLengthField(b.descr));
-            sndPulsComposit.write(UtilsProtocol.getLengthField(b.link));
+            sndPulsComposit.write(ProtocolUtils.getLengthField(b.descr));
+            sndPulsComposit.write(ProtocolUtils.getLengthField(b.link));
         }
 
         byte[] sndPuls = sndPulsComposit.toByteArray();

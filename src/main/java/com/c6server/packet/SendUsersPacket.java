@@ -1,6 +1,6 @@
 package com.c6server.packet;
 
-import com.c6server.utils.UtilsProtocol;
+import com.c6server.utils.ProtocolUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class SendUsersPacket {
         int lenNick = 2;
         int nickLength = 0;
         for (NetFriends nf : netFriendsOnline) {
-            nickLength += UtilsProtocol.getLengthField(nf.nick).length;
+            nickLength += ProtocolUtils.getLengthField(nf.nick).length;
         }
 
         int totalLen = lenNick + nickLength;
@@ -66,7 +66,7 @@ public class SendUsersPacket {
         sndUsersComposit.write(getLength());
         sndUsersComposit.write(getNumNick());
         for (SendUsersPacket.NetFriends netFriend : netFriendsOnline) {
-            sndUsersComposit.write(UtilsProtocol.getLengthField(netFriend.nick));
+            sndUsersComposit.write(ProtocolUtils.getLengthField(netFriend.nick));
         }
 
         byte[] sndUsers = sndUsersComposit.toByteArray();

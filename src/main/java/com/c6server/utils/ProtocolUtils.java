@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UtilsProtocol {
+public class ProtocolUtils {
 
     private final static Integer INIT_NICK_LIST = 14;
 

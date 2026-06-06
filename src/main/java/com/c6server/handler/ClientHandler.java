@@ -2,6 +2,7 @@ package com.c6server.handler;
 
 import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
+import com.c6server.c6enum.C6EnumRoom;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.UserDAO;
 import com.c6server.model.LoginEntity;
@@ -9,7 +10,7 @@ import com.c6server.model.MessageRequest;
 import com.c6server.packet.*;
 import com.c6server.utils.AESUtils;
 import com.c6server.utils.PingManagerUtils;
-import com.c6server.utils.UtilsProtocol;
+import com.c6server.utils.ProtocolUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,9 +45,9 @@ public class ClientHandler {
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
                 byte[] data      = Arrays.copyOf(buffer, bytesRead);
-                byte[] orderKey  = UtilsProtocol.reorderKey(key);
-                byte[] decoded   = UtilsProtocol.decodePacket(data, orderKey);
-                byte   cmdClient = UtilsProtocol.extractCmdClient(decoded);
+                byte[] orderKey  = ProtocolUtils.reorderKey(key);
+                byte[] decoded   = ProtocolUtils.decodePacket(data, orderKey);
+                byte   cmdClient = ProtocolUtils.extractCmdClient(decoded);
 
                 if (cmdClient == C6EnumClient.LOGIN.getCode()) {
                     nickname = handleLogin(decoded, key, out, conn);
@@ -128,7 +129,7 @@ public class ClientHandler {
             throws IOException, NoSuchAlgorithmException {
 
         byte[] heloProtocol = {0x20, 0x12, 0x00, 0x01, 0x00, 0x0B, 0x00, 0x02, 0x08};
-        byte[] key = UtilsProtocol.codKey();
+        byte[] key = ProtocolUtils.codKey();
 
         byte[] heloMessage = new byte[heloProtocol.length + key.length];
         System.arraycopy(heloProtocol, 0, heloMessage, 0, heloProtocol.length);
@@ -148,9 +149,9 @@ public class ClientHandler {
 
         logger.info("Il client sta effettuando il login");
 
-        LoginEntity loginEntity = UtilsProtocol.loginData(decoded);
+        LoginEntity loginEntity = ProtocolUtils.loginData(decoded);
 
-        boolean nickCheck = UtilsProtocol.checkC6Control(key, loginEntity.getNick(), loginEntity.getNickEncoded(), false);
+        boolean nickCheck = ProtocolUtils.checkC6Control(key, loginEntity.getNick(), loginEntity.getNickEncoded(), false);
 
         if (!nickCheck) {
             logger.warn("Spoofing rilevato, connessione chiusa.");
@@ -184,7 +185,7 @@ public class ClientHandler {
 
         }
         // Devo per forza salvare in chiaro la password su db perchè la key cambia e quindi anche la codifica
-        boolean passCheck = UtilsProtocol.checkC6Control(key, AESUtils.decrypt(userDAO.getPassword(loginEntity.getNick())), loginEntity.getPassEncoded(), true);
+        boolean passCheck = ProtocolUtils.checkC6Control(key, AESUtils.decrypt(userDAO.getPassword(loginEntity.getNick())), loginEntity.getPassEncoded(), true);
         if (!passCheck) {
             LoginErrorPassPacket loginErrorPassPacket = new LoginErrorPassPacket();
             loginErrorPassPacket.setCount(0);
@@ -246,9 +247,9 @@ public class ClientHandler {
         logger.debug("SND_PULS inviato");
 
         // quando sto in debug la REQ_USERS viene inviata insieme alla REQ_PULS
-        if (C6EnumClient.REQ_USERS.getCode() == UtilsProtocol.extractCmdReqUserOnLogin(decoded)) {
+        if (C6EnumClient.REQ_USERS.getCode() == ProtocolUtils.extractCmdReqUserOnLogin(decoded)) {
             logger.debug("REQ_USERS accoppiato a REQ_PULS (casistica debug)");
-            List<String> netFriends = UtilsProtocol.getReqUsersOnLogin(decoded);
+            List<String> netFriends = ProtocolUtils.getReqUsersOnLogin(decoded);
             // TODO: sostituire con check reale su DB
             List<String> netFriendsOnline = List.of("nick"); // lista mockkata
             sendOnlineUsers(netFriendsOnline, 5, out);
@@ -262,7 +263,7 @@ public class ClientHandler {
     private static void handleReqUsers(byte[] decoded, OutputStream out, String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
-        List<String> netFriends = UtilsProtocol.getReqUsers(decoded);
+        List<String> netFriends = ProtocolUtils.getReqUsers(decoded);
         logger.debug("REQ_USERS ricevuto, netFriends: " + netFriends);
 
         NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
@@ -279,7 +280,7 @@ public class ClientHandler {
 
     private static void handleOLMessage(byte[] decoded, OutputStream out) throws IOException {
 
-        MessageRequest messageRequest = UtilsProtocol.parseMessage(decoded);
+        MessageRequest messageRequest = ProtocolUtils.parseMessage(decoded);
         SrvMessagePacket srvMessagePacket = new SrvMessagePacket();
 
         srvMessagePacket.setCount(6);
@@ -297,7 +298,7 @@ public class ClientHandler {
     private static void handleDelUsers(byte[] decoded, OutputStream out, String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
-        List<String> netFriends = UtilsProtocol.getReqUsers(decoded);
+        List<String> netFriends = ProtocolUtils.getReqUsers(decoded);
         logger.debug("REQ_DEL ricevuto, netFriends: " + netFriends);
 
         NetFriendsDAO netFriendsDAO = new NetFriendsDAO(conn);
@@ -445,6 +446,16 @@ public class ClientHandler {
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("Richiesta profilo stanza");
+
+        ProfileRoomPacket profileRoomPacket = new ProfileRoomPacket();
+        profileRoomPacket.setCount(0);
+        profileRoomPacket.setRoomType(C6EnumRoom.PUBLIC_SERVER_ROOM.name());
+        profileRoomPacket.setRoomName("JOpenC6Server");
+        profileRoomPacket.setDescrizioneRoom("JOpenC6Server un nome un programma ... nel verso senso della parola");
+        profileRoomPacket.setOwnerNickname("ivan");
+
+        out.write(profileRoomPacket.getProfileRoomPacket());
+        out.flush();
 
     }
 
