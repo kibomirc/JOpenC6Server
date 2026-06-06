@@ -4,6 +4,7 @@ import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumRoom;
 import com.c6server.dao.NetFriendsDAO;
+import com.c6server.dao.RoomDAO;
 import com.c6server.dao.UserDAO;
 import com.c6server.model.LoginEntity;
 import com.c6server.model.MessageRequest;
@@ -11,6 +12,7 @@ import com.c6server.packet.*;
 import com.c6server.utils.AESUtils;
 import com.c6server.utils.PingManagerUtils;
 import com.c6server.utils.ProtocolUtils;
+import com.c6server.utils.RoomsUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -447,16 +449,27 @@ public class ClientHandler {
 
         System.out.println("Richiesta profilo stanza");
 
-        ProfileRoomPacket profileRoomPacket = new ProfileRoomPacket();
-        profileRoomPacket.setCount(0);
-        profileRoomPacket.setRoomType(C6EnumRoom.PUBLIC_SERVER_ROOM.name());
-        profileRoomPacket.setRoomName("JOpenC6Server");
-        profileRoomPacket.setDescrizioneRoom("JOpenC6Server un nome un programma ... nel verso senso della parola");
-        profileRoomPacket.setOwnerNickname("ivan");
+        // TODO ESTRAZIONE NOME STANZA
+        // devo estarre il nome della stanza dalla richieste
+        String roomName = RoomsUtils.getRoomName(decoded);
 
-        out.write(profileRoomPacket.getProfileRoomPacket());
-        out.flush();
+        // TODO controllare se la stanza esiste
+         RoomDAO roomDAO = new RoomDAO(conn);
 
+
+         if(roomDAO.exists(roomName)) {
+             // TODO assegnare i valori del risultato al profileRoomPacket
+
+             ProfileRoomPacket profileRoomPacket = new ProfileRoomPacket();
+             profileRoomPacket.setCount(0);
+             profileRoomPacket.setRoomType(roomDAO.getType(roomName));
+             profileRoomPacket.setRoomName(roomName);
+             profileRoomPacket.setDescrizioneRoom(roomDAO.getDescription(roomName));
+             profileRoomPacket.setOwnerNickname(roomDAO.getOwnerNickname(roomName));
+
+             out.write(profileRoomPacket.getProfileRoomPacket());
+             out.flush();
+         }
     }
 
     // -------------------------------------------------------------------------
