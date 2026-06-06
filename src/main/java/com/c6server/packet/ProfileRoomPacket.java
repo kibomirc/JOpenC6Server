@@ -53,30 +53,21 @@ public class ProfileRoomPacket {
         return new byte[]{ C6EnumRoom.valueOf(roomType).getCode() };
     }
 
-    public byte[] getLengthWithOwnerNickname() {
-        int lenOwnerNickname = ownerNickname.length();
-        byte lenOwnerNicknameByte = (byte) (lenOwnerNickname & 0xFF);
-
-        byte[] ownerNicknameBytes = ownerNickname.getBytes(StandardCharsets.UTF_8);
-
-        return concatBytes(new byte[]{lenOwnerNicknameByte}, ownerNicknameBytes);
-    }
-
     public byte[] getLengthWithRoomName() {
-        int lenRoomName = roomName.length();
-        byte lenRoomNameByte = (byte) (lenRoomName & 0xFF);
-
-        byte[] roomNameBytes = roomName.getBytes(StandardCharsets.UTF_8);
-
+        byte[] roomNameBytes = roomName.getBytes(StandardCharsets.ISO_8859_1);
+        byte lenRoomNameByte = (byte) (roomNameBytes.length & 0xFF);
         return concatBytes(new byte[]{lenRoomNameByte}, roomNameBytes);
     }
 
+    public byte[] getLengthWithOwnerNickname() {
+        byte[] ownerNicknameBytes = ownerNickname.getBytes(StandardCharsets.ISO_8859_1);
+        byte lenOwnerNicknameByte = (byte) (ownerNicknameBytes.length & 0xFF);
+        return concatBytes(new byte[]{lenOwnerNicknameByte}, ownerNicknameBytes);
+    }
+
     public byte[] getLengthWithDescrizioneRoom() {
-        int lenDescrizioneRoom = descrizioneRoom.length();
-        byte lenDescrizioneRoomByte = (byte) (lenDescrizioneRoom & 0xFF);
-
-        byte[] descrizioneRoomBytes = descrizioneRoom.getBytes(StandardCharsets.UTF_8);
-
+        byte[] descrizioneRoomBytes = descrizioneRoom.getBytes(StandardCharsets.ISO_8859_1);
+        byte lenDescrizioneRoomByte = (byte) (descrizioneRoomBytes.length & 0xFF);
         return concatBytes(new byte[]{lenDescrizioneRoomByte}, descrizioneRoomBytes);
     }
 
