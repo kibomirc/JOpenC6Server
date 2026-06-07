@@ -1,21 +1,25 @@
 package com.c6server.packet;
 
 import com.c6server.c6enum.C6EnumRoom;
+import com.c6server.c6enum.C6EnumRoomPreferences;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.c6server.packet.InfoLoginPacket.concatBytes;
 
 public class ProfileRoomPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x37 };
-    private final byte[] UNKNOW_BYTE = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+    private final byte[] UNKNOW_BYTE = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x08, 0x04 };
     private String roomName;
     private String ownerNickname;
     private String descrizioneRoom;
     private String roomType;
     private Integer count;
+    private List<RoomPreference> preferences = new ArrayList<>();
 
     public void setCount(Integer count) {
         this.count = count;
@@ -51,6 +55,29 @@ public class ProfileRoomPacket {
 
     public byte[] getRoomType() {
         return new byte[]{ C6EnumRoom.valueOf(roomType).getCode() };
+    }
+
+    public void addPreference(C6EnumRoomPreferences pref) {
+        preferences.add(new RoomPreference(pref.getIndex(), pref.getVal()));
+    }
+
+    public byte[] getPreferences() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        // contatore su 4 byte
+        int count = preferences.size();
+        out.write((count >> 24) & 0xFF);
+        out.write((count >> 16) & 0xFF);
+        out.write((count >> 8)  & 0xFF);
+        out.write(count         & 0xFF);
+
+        // per ogni preferenza: indice + valore
+        for (RoomPreference pref : preferences) {
+            out.write(pref.index);
+            out.write(pref.value);
+        }
+
+        return out.toByteArray();
     }
 
     public byte[] getLengthWithRoomName() {
@@ -119,6 +146,14 @@ public class ProfileRoomPacket {
 
     }
 
+    public class RoomPreference {
+        public final byte index;
+        public final byte value;
 
+        public RoomPreference(byte index, byte value) {
+            this.index = index;
+            this.value = value;
+        }
+    }
 
 }

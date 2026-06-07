@@ -3,6 +3,7 @@ package com.c6server.handler;
 import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumRoom;
+import com.c6server.c6enum.C6EnumRoomPreferences;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
 import com.c6server.dao.UserDAO;
@@ -449,11 +450,11 @@ public class ClientHandler {
 
         System.out.println("Richiesta profilo stanza");
 
-        // TODO ESTRAZIONE NOME STANZA
+        // ESTRAZIONE NOME STANZA
         // devo estarre il nome della stanza dalla richieste
         String roomName = RoomsUtils.getRoomName(decoded);
 
-        // TODO controllare se la stanza esiste
+        // controllare se la stanza esiste
          RoomDAO roomDAO = new RoomDAO(conn);
 
 
@@ -466,6 +467,12 @@ public class ClientHandler {
              profileRoomPacket.setRoomName(roomName);
              profileRoomPacket.setDescrizioneRoom(roomDAO.getDescription(roomName));
              profileRoomPacket.setOwnerNickname(roomDAO.getOwnerNickname(roomName));
+
+             // TODO qui bisogna fare un controllo al db se esiste si aggiunge la preferenza
+             profileRoomPacket.addPreference(C6EnumRoomPreferences.ARTI_MARZIALI);
+
+
+
 
              out.write(profileRoomPacket.getProfileRoomPacket());
              out.flush();
