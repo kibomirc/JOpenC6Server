@@ -469,7 +469,7 @@ public class ClientHandler {
              profileRoomPacket.setOwnerNickname(roomDAO.getOwnerNickname(roomName));
 
              // TODO qui bisogna fare un controllo al db se esiste si aggiunge la preferenza
-             profileRoomPacket.addPreference(C6EnumRoomPreferences.ARTI_MARZIALI);
+             profileRoomPacket.addPreference(C6EnumRoomPreferences.SPORT_ARTI_MARZIALI);
 
 
 
