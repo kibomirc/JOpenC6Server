@@ -12,5 +12,17 @@ CREATE TABLE IF NOT EXISTS rooms (
         'PUBLIC_USER_ROOM_ONLY_READER',
         'PRIVATE_SERVER_ROOM_ONLY_READER',
         'PUBLIC_SERVER_ROOM_ONLY_READER'
-    ))
+    )),
+    eta                     TEXT,
+    genere                  TEXT,
+    orientamento            TEXT,
+    occupazione             TEXT,
+    area_geografica         TEXT,
+    regione_provincia       TEXT,
+    hobby                   TEXT,
+    sport                   TEXT,
+    genere_musicale         TEXT,
+    genere_cinematografico  TEXT,
+    comunita_virtuale       TEXT,
+    odi_cordiali            TEXT
 );
