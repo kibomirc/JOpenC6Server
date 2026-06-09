@@ -13,7 +13,8 @@ import static com.c6server.packet.InfoLoginPacket.concatBytes;
 
 public class ProfileRoomPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x37 };
-    private final byte[] UNKNOW_BYTE = new byte[] { 0x00, 0x00, 0x00, 0x01, 0x08, 0x04 };
+    private final byte[] NULL_PREFERENCES = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+
     private String roomName;
     private String ownerNickname;
     private String descrizioneRoom;
@@ -104,9 +105,16 @@ public class ProfileRoomPacket {
         int typeRoom = 1;
         int lenDescrizioneRoom = getLengthWithDescrizioneRoom().length;
         int lenOwnerNickname = getLengthWithOwnerNickname().length;
-        int lenUnknowByte = UNKNOW_BYTE.length;
 
-        int totalLen = lenRoomName + typeRoom + lenDescrizioneRoom + lenOwnerNickname + lenUnknowByte;
+        int lenPreferencesByte = 0;
+
+        if(this.getPreferences().length > 0) {
+            lenPreferencesByte = getPreferences().length;
+        } else {
+            lenPreferencesByte = NULL_PREFERENCES.length;
+        }
+
+        int totalLen = lenRoomName + typeRoom + lenDescrizioneRoom + lenOwnerNickname + lenPreferencesByte;
 
         byte[] totalLenBytes = new byte[2];
         totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
@@ -125,7 +133,12 @@ public class ProfileRoomPacket {
         profileRoomPacketComposit.write(getRoomType());
         profileRoomPacketComposit.write(getLengthWithDescrizioneRoom());
         profileRoomPacketComposit.write(getLengthWithOwnerNickname());
-        profileRoomPacketComposit.write(UNKNOW_BYTE);
+
+        if(this.getPreferences().length > 0) {
+            profileRoomPacketComposit.write(getPreferences());
+        } else {
+            profileRoomPacketComposit.write(NULL_PREFERENCES);
+        }
 
         byte[] profileRoomPacket = profileRoomPacketComposit.toByteArray();
 
@@ -137,7 +150,7 @@ public class ProfileRoomPacket {
         System.out.println("RoomType: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getRoomType()));
         System.out.println("LengthWithDescrizioneRoom: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithDescrizioneRoom()));
         System.out.println("LengthWithDescrizioneRoom: " + java.util.HexFormat.ofDelimiter(" ").formatHex(getLengthWithDescrizioneRoom()));
-        System.out.println("Preference ROOM da vedere dopo: " + java.util.HexFormat.ofDelimiter(" ").formatHex(UNKNOW_BYTE));
+        System.out.println("Preference ROOM da vedere dopo: " + java.util.HexFormat.ofDelimiter(" ").formatHex(NULL_PREFERENCES));
         System.out.println("Payload (Hex): " + java.util.HexFormat.ofDelimiter(" ").formatHex(profileRoomPacket));
 
 

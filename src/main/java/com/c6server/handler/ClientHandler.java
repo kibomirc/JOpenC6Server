@@ -468,11 +468,19 @@ public class ClientHandler {
              profileRoomPacket.setDescrizioneRoom(roomDAO.getDescription(roomName));
              profileRoomPacket.setOwnerNickname(roomDAO.getOwnerNickname(roomName));
 
-             // TODO qui bisogna fare un controllo al db se esiste si aggiunge la preferenza
-             if(roomDAO.getSport(roomName).equals(C6EnumRoomPreferences.SPORT_ARTI_MARZIALI)) profileRoomPacket.addPreference(C6EnumRoomPreferences.SPORT_ARTI_MARZIALI);
-
-
-
+             if (roomDAO.getEta(roomName) != null) profileRoomPacket.addPreference(roomDAO.getEta(roomName));
+             if (roomDAO.getGenere(roomName) != null) profileRoomPacket.addPreference(roomDAO.getGenere(roomName));
+             if (roomDAO.getOrientamento(roomName) != null) profileRoomPacket.addPreference(roomDAO.getGenere(roomName));
+             if (roomDAO.getOccupazione(roomName) != null) profileRoomPacket.addPreference(roomDAO.getOccupazione(roomName));
+             if (roomDAO.getSport(roomName) != null) profileRoomPacket.addPreference(roomDAO.getSport(roomName));
+             if (roomDAO.getAreaGeografica(roomName) != null) profileRoomPacket.addPreference(roomDAO.getAreaGeografica(roomName));
+             if (roomDAO.getAreaGeografica(roomName) != null && roomDAO.getRegioneProvinciale(roomName) != null) profileRoomPacket.addPreference(roomDAO.getRegioneProvinciale(roomName));
+             if (roomDAO.getHobby(roomName) != null) profileRoomPacket.addPreference(roomDAO.getHobby(roomName));
+             if (roomDAO.getSport(roomName) != null) profileRoomPacket.addPreference(roomDAO.getSport(roomName));
+             if (roomDAO.getGenereMusicale(roomName) != null) profileRoomPacket.addPreference(roomDAO.getGenereMusicale(roomName));
+             if (roomDAO.getGenereCinematografico(roomName) != null) profileRoomPacket.addPreference(roomDAO.getGenereCinematografico(roomName));
+             if (roomDAO.getComunitaVirtuale(roomName) != null) profileRoomPacket.addPreference(roomDAO.getComunitaVirtuale(roomName));
+             if (roomDAO.getOdiCordiali(roomName) != null) profileRoomPacket.addPreference(roomDAO.getOdiCordiali(roomName));
 
              out.write(profileRoomPacket.getProfileRoomPacket());
              out.flush();
