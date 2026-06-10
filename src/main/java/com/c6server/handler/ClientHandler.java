@@ -4,6 +4,7 @@ import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
 import com.c6server.c6enum.C6EnumRoom;
 import com.c6server.c6enum.C6EnumRoomPreferences;
+import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
 import com.c6server.dao.UserDAO;
@@ -442,7 +443,7 @@ public class ClientHandler {
 
 
     // -------------------------------------------------------------------------
-    // PROFILE_ROOM — salva la lista amici e risponde con gli utenti online
+    // PROFILE_ROOM — invia i dati per la richiesta profilo della stanza
     // -------------------------------------------------------------------------
 
     private static void handleProfileRoom(byte[] decoded, OutputStream out, String nickname, Connection conn)
@@ -459,7 +460,6 @@ public class ClientHandler {
 
 
          if(roomDAO.exists(roomName)) {
-             // TODO assegnare i valori del risultato al profileRoomPacket
 
              ProfileRoomPacket profileRoomPacket = new ProfileRoomPacket();
              profileRoomPacket.setCount(0);
@@ -488,14 +488,23 @@ public class ClientHandler {
     }
 
     // -------------------------------------------------------------------------
-    // PROFILE_ROOM — restituisce il profilo della stanza
+    // PROFILE_ROOM —  invia i dati per la richiesta profilo dell' utente
     // -------------------------------------------------------------------------
 
     private static void handleProfileUser(byte[] decoded, OutputStream out, String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("Richiesta profilo utente");
+        // TODO fare funzione che estare il nickname da decode
 
+        ProfileUserPacket profileUserPacket = new ProfileUserPacket();
+        profileUserPacket.setNickname("prova");
+        profileUserPacket.setCount(0);
+        profileUserPacket.setEpochSeconds(563166600);
+        profileUserPacket.addPreference(C6EnumUserProfilePreferences.HOBBY_COMPUTER);
+
+        out.write(profileUserPacket.getProfileUserPacket());
+        out.flush();
     }
 
     // -------------------------------------------------------------------------
