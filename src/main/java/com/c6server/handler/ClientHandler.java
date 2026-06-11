@@ -497,20 +497,26 @@ public class ClientHandler {
         // TODO fare funzione che estare il nickname da decode
         String nickProfile = UsersUtils.getProfileName(decoded);
 
-        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
-        UserProfileEntity profilo = userPreferencesDAO.loadProfile(nickProfile);
+        UserDAO userDAO = new UserDAO(conn);
 
-        ProfileUserPacket profileUserPacket = new ProfileUserPacket();
-        profileUserPacket.setNickname(nickProfile);
-        profileUserPacket.setCount(0);
-        profileUserPacket.setEpochSeconds(563166600);
+        if(userDAO.exists(nickProfile)) {
+            UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
+            UserProfileEntity profilo = userPreferencesDAO.loadProfile(nickProfile);
 
-        for (C6EnumUserProfilePreferences pref : profilo.toFlatList()) {
-            profileUserPacket.addPreference(pref);
+            ProfileUserPacket profileUserPacket = new ProfileUserPacket();
+            profileUserPacket.setNickname(nickProfile);
+            profileUserPacket.setCount(0);
+            profileUserPacket.setEpochSeconds(563166600);
+
+            for (C6EnumUserProfilePreferences pref : profilo.toFlatList()) {
+                profileUserPacket.addPreference(pref);
+            }
+
+            out.write(profileUserPacket.getProfileUserPacket());
+            out.flush();
+        } else {
+            System.out.println("Nick non esistente!");
         }
-
-        out.write(profileUserPacket.getProfileUserPacket());
-        out.flush();
     }
 
     // -------------------------------------------------------------------------
