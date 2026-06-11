@@ -2,8 +2,6 @@ package com.c6server.handler;
 
 import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
-import com.c6server.c6enum.C6EnumRoom;
-import com.c6server.c6enum.C6EnumRoomPreferences;
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
@@ -17,7 +15,10 @@ import com.c6server.utils.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -402,7 +403,9 @@ public class ClientHandler {
         out.flush();
 
         for(String member : members) {
-            ClientRegistry.sendTo(member, notifyEnterRoomPacket.getNotifyRoomPacket());
+            if (!member.equals(nickname)) {
+                ClientRegistry.sendTo(member, notifyEnterRoomPacket.getNotifyRoomPacket());
+            }
         }
 
     }
@@ -417,16 +420,24 @@ public class ClientHandler {
 
         System.out.println("L utente " + nickname + " ha inviato un messaggio nella stanza!");
 
-        //TODO CABLIAMO IL MESSAGGIO IN STANZA E INDIRIZIAMOLO A BIGALEX
+        RoomDAO roomDAO = new RoomDAO(conn);
+        String roomName = RoomsUtils.getRoomName(decoded);
 
         MessageRoomPacket messageRoomPacket = new MessageRoomPacket();
         messageRoomPacket.setCount(0);
-        messageRoomPacket.setNicknameMittente("ivan");
-        messageRoomPacket.setRoomDestinazione("JOpenC6Server");
+        messageRoomPacket.setNicknameMittente(nickname);
+        messageRoomPacket.setRoomDestinazione(roomName);
         messageRoomPacket.setStile(new byte[]{ 0x00, 0x02 });
-        messageRoomPacket.setMessaggio("Funzionaaaaa");
+        messageRoomPacket.setMessaggio(RoomsUtils.getRoomMessage(decoded));
 
-        ClientRegistry.sendTo("bigalex", messageRoomPacket.getMessageRoomPacket());
+        List<String> members = roomDAO.getMembers(roomName);
+        members.remove(nickname);
+
+        for(String member : members) {
+            if (!member.equals(nickname)) {
+                ClientRegistry.sendTo(member, messageRoomPacket.getMessageRoomPacket());
+            }
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -450,7 +461,9 @@ public class ClientHandler {
         List<String> members = roomDAO.getMembers(roomName);
 
         for(String member : members) {
-            ClientRegistry.sendTo(member, notifyExitRoomPacket.getNotifyRoomPacket());
+            if (!member.equals(nickname)) {
+                ClientRegistry.sendTo(member, notifyExitRoomPacket.getNotifyRoomPacket());
+            }
         }
     }
 
