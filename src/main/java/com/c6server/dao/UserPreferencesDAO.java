@@ -1,10 +1,7 @@
 package com.c6server.dao;
 
-
-
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.model.UserProfileEntity;
-
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,16 +12,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 /**
- * DAO per la tabella user_preferences.
+ * DAO per la tabella user_preferences, basato su una Connection condivisa.
  *
  * Schema atteso:
  *   user_preferences(nickname TEXT, pref_index SMALLINT, slot SMALLINT, pref_val TEXT)
  *   PK (nickname, pref_index, slot)
  *
- * Strategia di salvataggio: delete-and-insert in transazione.
+ * La Connection viene passata nel costruttore e NON viene mai chiusa dal DAO:
+ * il ciclo di vita (apertura/chiusura) e' responsabilita' del chiamante,
+ * tipicamente il ClientHandler che la riceve all'accettazione del client.
+ *
+ * ATTENZIONE: una Connection non e' thread-safe. Questo DAO va usato
+ * da un solo thread alla volta (va bene nel modello "un thread per client":
+ * ogni handler crea il SUO DAO sulla SUA connection).
  */
 public class UserPreferencesDAO {
 
@@ -57,10 +58,10 @@ public class UserPreferencesDAO {
             ORDER BY nickname
             """;
 
-    private final DataSource dataSource;
+    private final Connection conn;
 
-    public UserPreferencesDAO(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public UserPreferencesDAO(Connection conn) {
+        this.conn = conn;
     }
 
     // ------------------------------------------------------------------
@@ -74,9 +75,7 @@ public class UserPreferencesDAO {
     public UserProfileEntity loadProfile(String nickname) throws SQLException {
         UserProfileEntity profile = new UserProfileEntity();
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_USER)) {
-
+        try (PreparedStatement ps = conn.prepareStatement(SQL_SELECT_BY_USER)) {
             ps.setString(1, nickname);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -107,26 +106,24 @@ public class UserPreferencesDAO {
      * o non viene toccato nulla.
      */
     public void saveProfile(String nickname, UserProfileEntity profile) throws SQLException {
-        try (Connection conn = dataSource.getConnection()) {
-            boolean oldAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-            try {
-                // 1) cancella tutte le preferenze esistenti
-                try (PreparedStatement ps = conn.prepareStatement(SQL_DELETE_BY_USER)) {
-                    ps.setString(1, nickname);
-                    ps.executeUpdate();
-                }
-
-                // 2) reinserisce quelle del profilo, slot progressivi per categoria
-                insertPreferences(conn, nickname, profile.toFlatList());
-
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            } finally {
-                conn.setAutoCommit(oldAutoCommit);
+        boolean oldAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        try {
+            // 1) cancella tutte le preferenze esistenti
+            try (PreparedStatement ps = conn.prepareStatement(SQL_DELETE_BY_USER)) {
+                ps.setString(1, nickname);
+                ps.executeUpdate();
             }
+
+            // 2) reinserisce quelle del profilo, slot progressivi per categoria
+            insertPreferences(nickname, profile.toFlatList());
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(oldAutoCommit);
         }
     }
 
@@ -152,26 +149,24 @@ public class UserPreferencesDAO {
             }
         }
 
-        try (Connection conn = dataSource.getConnection()) {
-            boolean oldAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement ps =
-                             conn.prepareStatement(SQL_DELETE_BY_USER_AND_CATEGORY)) {
-                    ps.setString(1, nickname);
-                    ps.setShort(2, prefIndex);
-                    ps.executeUpdate();
-                }
-
-                insertPreferences(conn, nickname, nuovePreferenze);
-
-                conn.commit();
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            } finally {
-                conn.setAutoCommit(oldAutoCommit);
+        boolean oldAutoCommit = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        try {
+            try (PreparedStatement ps =
+                         conn.prepareStatement(SQL_DELETE_BY_USER_AND_CATEGORY)) {
+                ps.setString(1, nickname);
+                ps.setShort(2, prefIndex);
+                ps.executeUpdate();
             }
+
+            insertPreferences(nickname, nuovePreferenze);
+
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(oldAutoCommit);
         }
     }
 
@@ -181,8 +176,7 @@ public class UserPreferencesDAO {
      * non serve chiamarlo a mano.)
      */
     public void deleteAll(String nickname) throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_DELETE_BY_USER)) {
+        try (PreparedStatement ps = conn.prepareStatement(SQL_DELETE_BY_USER)) {
             ps.setString(1, nickname);
             ps.executeUpdate();
         }
@@ -200,9 +194,7 @@ public class UserPreferencesDAO {
             throws SQLException {
 
         List<String> nicknames = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SQL_SELECT_USERS_BY_PREF)) {
-
+        try (PreparedStatement ps = conn.prepareStatement(SQL_SELECT_USERS_BY_PREF)) {
             ps.setString(1, pref.name());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -222,8 +214,7 @@ public class UserPreferencesDAO {
      * (1, 2, 3) per ciascuna categoria. Usa batch insert.
      * Va chiamato dentro una transazione gia' aperta.
      */
-    private void insertPreferences(Connection conn,
-                                   String nickname,
+    private void insertPreferences(String nickname,
                                    List<C6EnumUserProfilePreferences> preferenze)
             throws SQLException {
 

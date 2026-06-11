@@ -8,13 +8,12 @@ import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
 import com.c6server.dao.UserDAO;
+import com.c6server.dao.UserPreferencesDAO;
 import com.c6server.model.LoginEntity;
 import com.c6server.model.MessageRequest;
+import com.c6server.model.UserProfileEntity;
 import com.c6server.packet.*;
-import com.c6server.utils.AESUtils;
-import com.c6server.utils.PingManagerUtils;
-import com.c6server.utils.ProtocolUtils;
-import com.c6server.utils.RoomsUtils;
+import com.c6server.utils.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -496,12 +495,19 @@ public class ClientHandler {
 
         System.out.println("Richiesta profilo utente");
         // TODO fare funzione che estare il nickname da decode
+        String nickProfile = UsersUtils.getProfileName(decoded);
+
+        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
+        UserProfileEntity profilo = userPreferencesDAO.loadProfile(nickProfile);
 
         ProfileUserPacket profileUserPacket = new ProfileUserPacket();
-        profileUserPacket.setNickname("prova");
+        profileUserPacket.setNickname(nickProfile);
         profileUserPacket.setCount(0);
         profileUserPacket.setEpochSeconds(563166600);
-        profileUserPacket.addPreference(C6EnumUserProfilePreferences.HOBBY_COMPUTER);
+
+        for (C6EnumUserProfilePreferences pref : profilo.toFlatList()) {
+            profileUserPacket.addPreference(pref);
+        }
 
         out.write(profileUserPacket.getProfileUserPacket());
         out.flush();

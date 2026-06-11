@@ -1,5 +1,6 @@
 package com.c6Server;
 
+import com.c6server.dao.DatabaseConnection;
 import com.c6server.dao.UserPreferencesDAO;
 import com.c6server.model.UserProfileEntity;
 
@@ -12,6 +13,7 @@ import org.sqlite.SQLiteDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -28,8 +30,8 @@ class UserPreferencesDaoTest {
     private static final String DB_FILE =
             System.getProperty("c6.test.db", "c6-server-test.db");
 
-    private static DataSource dataSource;
     private static UserPreferencesDAO dao;
+    private static Connection connection;
 
     // ------------------------------------------------------------------
     // SETUP: datasource SQLite su file, schema, utente ivan
@@ -37,54 +39,27 @@ class UserPreferencesDaoTest {
 
     @BeforeAll
     static void setUpDatabase() throws SQLException {
-        SQLiteConfig config = new SQLiteConfig();
-        // SQLite di default NON fa rispettare le foreign key: va attivato
-        config.enforceForeignKeys(true);
 
-        SQLiteDataSource ds = new SQLiteDataSource(config);
-        ds.setUrl("jdbc:sqlite:" + DB_FILE);
-        dataSource = ds;
-        dao = new UserPreferencesDAO(ds);
+        String testUrl = "jdbc:sqlite:c6-server-test.db";
+        connection = DriverManager.getConnection(testUrl);
 
-        try (Connection conn = ds.getConnection();
-             Statement st = conn.createStatement()) {
+        try (Statement st = connection.createStatement()) {
 
-            st.execute("""
-                    CREATE TABLE IF NOT EXISTS users (
-                        nickname TEXT PRIMARY KEY,
-                        nome     TEXT NOT NULL,
-                        email    TEXT NOT NULL UNIQUE,
-                        password TEXT NOT NULL,
-                        online   BOOLEAN NOT NULL DEFAULT FALSE,
-                        status   TEXT NOT NULL DEFAULT 'available',
-                        ping_ms  INTEGER NOT NULL DEFAULT 0,
+            st.execute("PRAGMA foreign_keys = ON");
 
-                        CONSTRAINT check_status CHECK (status IN ('available', 'busy', 'away')),
-                        CONSTRAINT check_ping_positivo CHECK (ping_ms >= 0)
-                    )
-                    """);
+            // CREATE TABLE users ...
+
+            // CREATE TABLE user_preferences ...
 
             st.execute("""
-                    CREATE TABLE IF NOT EXISTS user_preferences (
-                        nickname    TEXT     NOT NULL REFERENCES users(nickname) ON DELETE CASCADE,
-                        pref_index  SMALLINT NOT NULL,
-                        slot        SMALLINT NOT NULL,
-                        pref_val    TEXT     NOT NULL,
-
-                        PRIMARY KEY (nickname, pref_index, slot),
-                        CONSTRAINT check_slot CHECK (slot BETWEEN 1 AND 3),
-                        CONSTRAINT check_categorie_singole
-                            CHECK (pref_index NOT IN (1, 2, 3, 4, 5, 6, 11) OR slot = 1),
-                        CONSTRAINT uq_no_duplicati UNIQUE (nickname, pref_index, pref_val)
-                    )
-                    """);
-
-            // INSERT OR IGNORE: se ivan esiste gia' (run precedenti) non fallisce
-            st.execute("""
-                    INSERT OR IGNORE INTO users (nickname, nome, email, password)
-                    VALUES ('ivan', 'Ivan', 'ivan@example.com', 'segretissima')
-                    """);
+                INSERT OR IGNORE INTO users
+                (nickname, nome, email, password)
+                VALUES
+                ('ivan', 'Ivan', 'ivan@example.com', 'segretissima')
+                """);
         }
+
+        dao = new UserPreferencesDAO(connection);
     }
 
     /**
@@ -279,15 +254,25 @@ class UserPreferencesDaoTest {
     }
 
     /** INSERT diretto che bypassa model e DAO, per testare i vincoli SQL. */
-    private void rawInsert(String nickname, int prefIndex, int slot, String prefVal)
+    /** INSERT diretto che bypassa model e DAO, per testare i vincoli SQL. */
+    private void rawInsert(String nickname,
+                           int prefIndex,
+                           int slot,
+                           String prefVal)
             throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             var ps = conn.prepareStatement(
-                     "INSERT INTO user_preferences (nickname, pref_index, slot, pref_val) VALUES (?, ?, ?, ?)")) {
+
+        try (var ps = connection.prepareStatement(
+                """
+                INSERT INTO user_preferences
+                (nickname, pref_index, slot, pref_val)
+                VALUES (?, ?, ?, ?)
+                """)) {
+
             ps.setString(1, nickname);
             ps.setInt(2, prefIndex);
             ps.setInt(3, slot);
             ps.setString(4, prefVal);
+
             ps.executeUpdate();
         }
     }
