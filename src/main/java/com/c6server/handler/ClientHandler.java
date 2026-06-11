@@ -87,13 +87,13 @@ public class ClientHandler {
                     handleReqRoomList(nickname,conn,out);
                 }
                 if (cmdClient == C6EnumClient.ENTER_ROOM.getCode()) {
-                    handleEnterRoom(nickname, conn, out);
+                    handleEnterRoom(decoded, nickname, conn, out);
                 }
                 if (cmdClient == C6EnumClient.MESSAGE_ROOM.getCode()) {
                     handleMessageRoom(decoded,nickname, conn, out);
                 }
                 if (cmdClient == C6EnumClient.EXIT_ROOM.getCode()) {
-                    handleExitRoom(nickname, conn, out);
+                    handleExitRoom(decoded,nickname, conn, out);
                 }
                 if (cmdClient == C6EnumClient.PROFILE_ROOM.getCode()) {
                     handleProfileRoom(decoded, out, nickname, conn);
@@ -375,29 +375,35 @@ public class ClientHandler {
     // ------------------------------------------------------------------------
     // ENTER_ROOM - preleva dal db le room list da inviare al client
     // ------------------------------------------------------------------------
-    private static void handleEnterRoom(String nickname, Connection conn, OutputStream out)
+    private static void handleEnterRoom(byte[] decoded ,String nickname, Connection conn, OutputStream out)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("L' Utente vuole entrare in una stanza");
 
-        // devo estrapolare il nome della stanza
-        // simuliamo che entro on JOpenC6Server
+        RoomDAO roomDAO = new RoomDAO(conn);
+        String roomName = RoomsUtils.getRoomName(decoded);
+
+        roomDAO.addMember(roomName,nickname);
+
+        List<String> members = roomDAO.getMembers(roomName);
 
         EnterRoomPacket enterRoomPacket = new EnterRoomPacket();
         enterRoomPacket.setCount(0);
-        enterRoomPacket.addRoom("JOpenC6Server",1,List.of("bigalex"));
+        enterRoomPacket.addRoom(roomName,members.size(),members);
 
         // notifica utente chat
         NotifyEnterRoomPacket notifyEnterRoomPacket = new NotifyEnterRoomPacket();
-        notifyEnterRoomPacket.setRoom("JOpenC6Server");
+        notifyEnterRoomPacket.setRoom(roomName);
         notifyEnterRoomPacket.setCount(0);
-        notifyEnterRoomPacket.setNickname("ivan");
+        notifyEnterRoomPacket.setNickname(nickname);
 
 
         out.write(enterRoomPacket.getEnterRoomPacket());
         out.flush();
 
-        ClientRegistry.sendTo("bigalex", notifyEnterRoomPacket.getNotifyRoomPacket());
+        for(String member : members) {
+            ClientRegistry.sendTo(member, notifyEnterRoomPacket.getNotifyRoomPacket());
+        }
 
     }
 
@@ -426,18 +432,26 @@ public class ClientHandler {
     // ------------------------------------------------------------------------
     // EXIT_ROOM - Gestione
     // ------------------------------------------------------------------------
-    private static void handleExitRoom(String nickname, Connection conn, OutputStream out)
+    private static void handleExitRoom(byte[] decoded,String nickname, Connection conn, OutputStream out)
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("L' Utente è uscito dalla stanza");
+        RoomDAO roomDAO = new RoomDAO(conn);
+
+        String roomName = RoomsUtils.getRoomName(decoded);
+
+        roomDAO.removeMember(roomName,nickname);
 
         NotifyExitRoomPacket notifyExitRoomPacket = new NotifyExitRoomPacket();
         notifyExitRoomPacket.setCount(0);
-        notifyExitRoomPacket.setRoom("JOpenC6Server");
-        notifyExitRoomPacket.setNickname("ivan");
+        notifyExitRoomPacket.setRoom(roomName);
+        notifyExitRoomPacket.setNickname(nickname);
 
-        ClientRegistry.sendTo("bigalex", notifyExitRoomPacket.getNotifyRoomPacket());
+        List<String> members = roomDAO.getMembers(roomName);
 
+        for(String member : members) {
+            ClientRegistry.sendTo(member, notifyExitRoomPacket.getNotifyRoomPacket());
+        }
     }
 
 
@@ -452,7 +466,7 @@ public class ClientHandler {
 
         // ESTRAZIONE NOME STANZA
         // devo estarre il nome della stanza dalla richieste
-        String roomName = RoomsUtils.getRoomName(decoded);
+        String roomName = RoomsUtils.getRoomNameProfile(decoded);
 
         // controllare se la stanza esiste
          RoomDAO roomDAO = new RoomDAO(conn);
