@@ -9,7 +9,7 @@ import java.sql.Statement;
 
 public class DatabaseConnection {
 
-    private static final String URL = "jdbc:sqlite:c6.db";
+    private static final String URL = "jdbc:sqlite:c6-server.db";
     private static Connection connection = null;
 
 
