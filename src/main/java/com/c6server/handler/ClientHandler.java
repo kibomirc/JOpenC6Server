@@ -108,6 +108,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.REQ_SEARCH_NETFRIEND.getCode()) {
                     handleReqSearchNetFriend(decoded, out, nickname, conn);
                 }
+                if (cmdClient == C6EnumClient.CLIENT_REQ_EXIT.getCode()) {
+                    handleLogoutUser(out, nickname, conn);
+                }
             }
 
         } catch (IOException | SQLException e) {
@@ -565,6 +568,24 @@ public class ClientHandler {
             throws IOException, SQLException, NoSuchAlgorithmException {
         // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
         System.out.println("Richiesta netfriend profilo");
+
+    }
+
+    // -------------------------------------------------------------------------
+    // LOGOUT_USER — ricerca netFriends per profilo o e-mail
+    // -------------------------------------------------------------------------
+
+    private static void handleLogoutUser(OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+
+        System.out.println("Richiesta Logout Utente");
+
+        LogoutUserPacket logoutUserPacket = new LogoutUserPacket();
+        logoutUserPacket.setCount(0);
+        logoutUserPacket.setNickname(nickname);
+
+        out.write(logoutUserPacket.getLogoutUserPacket());
+        out.flush();
 
     }
 
