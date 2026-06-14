@@ -2,6 +2,7 @@ package com.c6server.handler;
 
 import com.c6server.ClientRegistry;
 import com.c6server.c6enum.C6EnumClient;
+import com.c6server.c6enum.C6EnumRoom;
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
@@ -366,6 +367,8 @@ public class ClientHandler {
 
         System.out.println("L' Utente sta chiedendo le stanze");
 
+        // TODO inviare le stanze create
+
         SendRoomPacket sendRoomPacket = new SendRoomPacket();
         sendRoomPacket.setCount(0);
         sendRoomPacket.addRoom("JOpenC6Server",100);
@@ -557,6 +560,13 @@ public class ClientHandler {
             throws IOException, SQLException, NoSuchAlgorithmException {
         // TODO nei data che avrò nel decode si dovrà vedere se la stanza è privata o meno e implementare le corrette logiche
         System.out.println("Richiesta creazione stanza");
+        String roomName = RoomsUtils.getRoomName(decoded);
+        String typeRoom = C6EnumRoom.PUBLIC_SERVER_ROOM.toString(); // valore mokkato deve essere estrapolato
+
+        RoomDAO roomDAO = new RoomDAO(conn);
+        if(!roomDAO.exists(roomName)) {
+            roomDAO.create(roomName,"descrizione",nickname,typeRoom); // TODO deve essere modificata la query per aggiungere anche le preferenze
+        }
 
     }
 
@@ -569,6 +579,12 @@ public class ClientHandler {
         // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
 
         System.out.println("Richiesta netfriend profilo");
+
+
+        /* Parametri mokkati saranno da prelevare da db e aggiungere la lista con i vari status
+           attenzione va esternalizzato lo status: netFriendSearchPacket.addNetFriend("bigalex",C6EnumNetFriend.ONLY_NETFRIEND.getCode());
+        */
+
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
