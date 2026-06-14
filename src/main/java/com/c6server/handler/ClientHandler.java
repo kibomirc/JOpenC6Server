@@ -567,7 +567,16 @@ public class ClientHandler {
     private static void handleReqSearchNetFriend(byte[] decoded, OutputStream out, String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
         // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
+
         System.out.println("Richiesta netfriend profilo");
+
+        NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
+        netFriendSearchPacket.setCount(0);
+        netFriendSearchPacket.addNetFriend("bigalex");
+
+
+        out.write(netFriendSearchPacket.getNetFriendSearchPacket());
+        out.flush();
 
     }
 
