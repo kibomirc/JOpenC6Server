@@ -29,6 +29,19 @@ public class RoomDAO {
             }
         }
 
+        public List<String> getRoomsAndType() throws SQLException {
+            String sql = "SELECT roomName, type FROM rooms;";
+            List<String> roomList = new ArrayList<>();
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        roomList.add(rs.getString("roomName") + "," + rs.getString("type"));
+                    }
+                }
+            }
+            return roomList;
+        }
+
         // Controlla se una stanza esiste
         public boolean exists(String roomName) throws SQLException {
             String sql = "SELECT 1 FROM rooms WHERE roomName = ?;";

@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ClientHandler {
 
@@ -368,12 +370,27 @@ public class ClientHandler {
         System.out.println("L' Utente sta chiedendo le stanze");
 
         // TODO inviare le stanze create
+        RoomDAO roomDAO = new RoomDAO(conn);
+        List<String> roomList = roomDAO.getRoomsAndType();
+
+        Map<String, List<String>> roomsByType = roomList.stream()
+                .collect(Collectors.groupingBy(r -> r.split(",")[1],
+                        Collectors.mapping(r -> r.split(",")[0], Collectors.toList())));
+
+        List<String> publicServerRooms = roomsByType.getOrDefault(C6EnumRoom.PUBLIC_SERVER_ROOM.name(), List.of());
+        List<String> publicUserRooms = roomsByType.getOrDefault(C6EnumRoom.PUBLIC_USER_ROOM.name(), List.of());
 
         SendRoomPacket sendRoomPacket = new SendRoomPacket();
         sendRoomPacket.setCount(0);
-        sendRoomPacket.addRoom("JOpenC6Server",100);
-        sendRoomPacket.addRoom("Amici",10);
-        sendRoomPacket.addNetFriendRoom("stanza privata!",4);
+
+        for (String publicServerRoom : publicServerRooms) {
+            sendRoomPacket.addRoom(publicServerRoom, roomDAO.getMembers(publicServerRoom).size());
+        }
+
+        for (String publicUserRoom : publicUserRooms) {
+            sendRoomPacket.addNetFriendRoom(publicUserRoom, roomDAO.getMembers(publicUserRoom).size());
+        }
+
         out.write(sendRoomPacket.getSendRoom());
         out.flush();
 
@@ -567,6 +584,9 @@ public class ClientHandler {
         if(!roomDAO.exists(roomName)) {
             roomDAO.create(roomName,"descrizione",nickname,typeRoom); // TODO deve essere modificata la query per aggiungere anche le preferenze
         }
+
+        handleEnterRoom(decoded ,nickname, conn, out);
+
 
     }
 
