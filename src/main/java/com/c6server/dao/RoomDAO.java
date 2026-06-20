@@ -1,6 +1,7 @@
 package com.c6server.dao;
 
 import com.c6server.c6enum.C6EnumRoomPreferences;
+import com.c6server.model.RoomProfileEntity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoomDAO {
         private final Connection connection;
@@ -17,17 +19,58 @@ public class RoomDAO {
         }
 
         // CREATE: Inserisce una nuova stanza
-        public void create(String roomName, String description, String ownerNickname, String type) throws SQLException {
-            String sql = "INSERT INTO rooms (roomName, description, ownerNickname, type) VALUES (?, ?, ?, ?);";
+        public void create(String roomName, String description, String ownerNickname, String type, RoomProfileEntity profile) throws SQLException {
+            StringBuilder columns = new StringBuilder("roomName, description, ownerNickname, type");
+            StringBuilder placeholders = new StringBuilder("?, ?, ?, ?");
+            List<Object> values = new ArrayList<>(List.of(roomName, description, ownerNickname, type));
+
+            addColumnIfPresent(columns, placeholders, values, "eta", profile.getEta());
+            addColumnIfPresent(columns, placeholders, values, "genere", profile.getGenere());
+            addColumnIfPresent(columns, placeholders, values, "orientamento", profile.getOrientamento());
+            addColumnIfPresent(columns, placeholders, values, "occupazione", profile.getOccupazione());
+            addColumnIfPresent(columns, placeholders, values, "area_geografica", profile.getAreaGeografica());
+            addColumnIfPresent(columns, placeholders, values, "regione_provincia", profile.getRegioneProvincia());
+            addColumnIfPresent(columns, placeholders, values, "comunita_virtuale", profile.getComunitaVirtuale());
+
+            addColumnIfPresentList(columns, placeholders, values, "hobby", profile.getHobby());
+            addColumnIfPresentList(columns, placeholders, values, "sport", profile.getSport());
+            addColumnIfPresentList(columns, placeholders, values, "genere_musicale", profile.getGeneriMusicali());
+            addColumnIfPresentList(columns, placeholders, values, "genere_cinematografico", profile.getGeneriFilm());
+            addColumnIfPresentList(columns, placeholders, values, "odi_cordiali", profile.getOdiCordiali());
+
+            String sql = "INSERT INTO rooms (" + columns + ") VALUES (" + placeholders + ");";
+
             try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                pstmt.setString(1, roomName);
-                pstmt.setString(2, description);
-                pstmt.setString(3, ownerNickname);
-                pstmt.setString(4, type);
+                for (int i = 0; i < values.size(); i++) {
+                    pstmt.setString(i + 1, values.get(i).toString());
+                }
                 pstmt.executeUpdate();
                 System.out.println("Stanza creata: " + roomName);
             }
         }
+
+    private void addColumnIfPresent(StringBuilder columns, StringBuilder placeholders,
+                                    List<Object> values, String columnName,
+                                    C6EnumRoomPreferences pref) {
+        if (pref != null) {
+            columns.append(", ").append(columnName);
+            placeholders.append(", ?");
+            values.add(pref.name());
+        }
+    }
+
+    private void addColumnIfPresentList(StringBuilder columns, StringBuilder placeholders,
+                                        List<Object> values, String columnName,
+                                        List<C6EnumRoomPreferences> prefs) {
+        if (prefs != null && !prefs.isEmpty()) {
+            columns.append(", ").append(columnName);
+            placeholders.append(", ?");
+            String joined = prefs.stream()
+                    .map(C6EnumRoomPreferences::name)
+                    .collect(Collectors.joining(","));
+            values.add(joined);
+        }
+    }
 
         public List<String> getRoomsAndType() throws SQLException {
             String sql = "SELECT roomName, type FROM rooms;";

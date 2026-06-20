@@ -1,5 +1,9 @@
 package com.c6server.utils;
 
+import com.c6server.c6enum.C6EnumRoom;
+import com.c6server.c6enum.C6EnumRoomPreferences;
+import com.c6server.model.RoomProfileEntity;
+
 import java.nio.charset.StandardCharsets;
 
 public class RoomsUtils {
@@ -38,6 +42,46 @@ public class RoomsUtils {
         int textLength = msgBlockLength - 2;      // il blocco include i 2 byte di header
 
         return new String(decoded, textIndex, textLength, StandardCharsets.ISO_8859_1);
+    }
+
+    // TODO da implementare
+    public static RoomProfileEntity getRoomProfile(byte[] decoded) {
+        RoomProfileEntity profile = new RoomProfileEntity();
+
+        int offset = 12; // inizio nickname
+
+        int nickLen = decoded[offset] & 0xFF;
+        offset += 1 + nickLen;
+
+        int roomLen = decoded[offset] & 0xFF;
+        offset += 1 + roomLen;
+
+        int descLen = decoded[offset] & 0xFF;
+        offset += 1 + descLen;
+
+        offset += 2; // tipo stanza + byte successivo
+
+        int count = decoded[offset] & 0xFF;
+        offset += 1;
+
+        for (int i = 0; i < count; i++) {
+            byte index = decoded[offset];
+            byte val = decoded[offset + 1];
+            try {
+                C6EnumRoomPreferences pref = C6EnumRoomPreferences.fromBytes(index, val);
+                profile.addGeneric(pref);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Coppia non riconosciuta: " + index + "," + val);
+            }
+            offset += 2;
+        }
+
+        return profile;
+    }
+
+    // TODO da implementare
+    public static String getTypeRoom(byte[] decoded) {
+        return C6EnumRoom.PUBLIC_USER_ROOM.name();
     }
 
 }

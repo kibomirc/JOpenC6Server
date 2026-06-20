@@ -42,14 +42,8 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [] **Invio RoomList :** invio delle roomList.
-- [] **Gestione Room :** gestire join e part.
-- [] **Gestione Messaggi in Room :**.
 - [] **Gestione Room NetFriend pubbliche:**
 - [] **Gestione Room NetFriend private:**
-- [] **Gestione invito in stanza:**
-- [] **Gestione profilo stanza:**
-- [] **Gestione profilo utente:**
 - [] **Ricerca NetFriend:**
 - [] **Servizio Rest con pagina per la registrazione:**
 ---

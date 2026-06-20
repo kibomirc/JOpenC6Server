@@ -10,6 +10,7 @@ import com.c6server.dao.UserDAO;
 import com.c6server.dao.UserPreferencesDAO;
 import com.c6server.model.LoginEntity;
 import com.c6server.model.MessageRequest;
+import com.c6server.model.RoomProfileEntity;
 import com.c6server.model.UserProfileEntity;
 import com.c6server.packet.*;
 import com.c6server.utils.*;
@@ -488,6 +489,11 @@ public class ClientHandler {
                 ClientRegistry.sendTo(member, notifyExitRoomPacket.getNotifyRoomPacket());
             }
         }
+
+        // TODO se la room è privata ed ha tipo PUBLIC_USER_ROOM o PRIVATE_USER_ROOM
+        // se si è ultimi ad uscire bisogna anche cancellare la stanza
+
+
     }
 
 
@@ -544,7 +550,6 @@ public class ClientHandler {
             throws IOException, SQLException, NoSuchAlgorithmException {
 
         System.out.println("Richiesta profilo utente");
-        // TODO fare funzione che estare il nickname da decode
         String nickProfile = UsersUtils.getProfileName(decoded);
 
         UserDAO userDAO = new UserDAO(conn);
@@ -556,7 +561,7 @@ public class ClientHandler {
             ProfileUserPacket profileUserPacket = new ProfileUserPacket();
             profileUserPacket.setNickname(nickProfile);
             profileUserPacket.setCount(0);
-            profileUserPacket.setEpochSeconds(563166600);
+            profileUserPacket.setEpochSeconds(563166600); // TODO aggiungere campo idleTime in tabella user in questo formato
 
             for (C6EnumUserProfilePreferences pref : profilo.toFlatList()) {
                 profileUserPacket.addPreference(pref);
@@ -575,14 +580,15 @@ public class ClientHandler {
 
     private static void handleCreateRoom(byte[] decoded, OutputStream out, String nickname, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
-        // TODO nei data che avrò nel decode si dovrà vedere se la stanza è privata o meno e implementare le corrette logiche
+
         System.out.println("Richiesta creazione stanza");
         String roomName = RoomsUtils.getRoomName(decoded);
-        String typeRoom = C6EnumRoom.PUBLIC_SERVER_ROOM.toString(); // valore mokkato deve essere estrapolato
+        String typeRoom = RoomsUtils.getTypeRoom(decoded); // TODO da implementare
+        RoomProfileEntity roomProfile = RoomsUtils.getRoomProfile(decoded);
 
         RoomDAO roomDAO = new RoomDAO(conn);
         if(!roomDAO.exists(roomName)) {
-            roomDAO.create(roomName,"descrizione",nickname,typeRoom); // TODO deve essere modificata la query per aggiungere anche le preferenze
+            roomDAO.create(roomName,"descrizione",nickname,typeRoom,roomProfile);
         }
 
         handleEnterRoom(decoded ,nickname, conn, out);
