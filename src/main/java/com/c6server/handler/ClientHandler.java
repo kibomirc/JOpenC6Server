@@ -490,9 +490,14 @@ public class ClientHandler {
             }
         }
 
-        // TODO se la room è privata ed ha tipo PUBLIC_USER_ROOM o PRIVATE_USER_ROOM
+        // se la room è privata ed ha tipo PUBLIC_USER_ROOM o PRIVATE_USER_ROOM
         // se si è ultimi ad uscire bisogna anche cancellare la stanza
-
+        String typeRoom = roomDAO.getType(roomName);
+        if(C6EnumRoom.PUBLIC_USER_ROOM.name().equals(typeRoom) || C6EnumRoom.PRIVATE_USER_ROOM.name().equals(typeRoom)) {
+            if(roomDAO.getMembers(roomName).size() == 0) {
+                roomDAO.delete(roomName);
+            }
+        }
 
     }
 
@@ -583,7 +588,7 @@ public class ClientHandler {
 
         System.out.println("Richiesta creazione stanza");
         String roomName = RoomsUtils.getRoomName(decoded);
-        String typeRoom = RoomsUtils.getTypeRoom(decoded); // TODO da implementare
+        String typeRoom = RoomsUtils.getTypeRoom(decoded);
         RoomProfileEntity roomProfile = RoomsUtils.getRoomProfile(decoded);
 
         RoomDAO roomDAO = new RoomDAO(conn);

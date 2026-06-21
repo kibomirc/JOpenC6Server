@@ -79,9 +79,21 @@ public class RoomsUtils {
         return profile;
     }
 
-    // TODO da implementare
     public static String getTypeRoom(byte[] decoded) {
-        return C6EnumRoom.PUBLIC_USER_ROOM.name();
+        int offset = 12; // inizio nickname
+
+        int nickLen = decoded[offset] & 0xFF;
+        offset += 1 + nickLen;
+
+        int roomLen = decoded[offset] & 0xFF;
+        offset += 1 + roomLen;
+
+        int descLen = decoded[offset] & 0xFF;
+        offset += 1 + descLen;
+
+        byte typeCode = decoded[offset];
+
+        return C6EnumRoom.fromCode(typeCode).name();
     }
 
 }
