@@ -42,10 +42,12 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [] **Gestione Room NetFriend pubbliche:**
-- [] **Gestione Room NetFriend private:**
+- [X] **Gestione Room NetFriend pubbliche:**
+- [X] **Gestione Room NetFriend private:**
 - [] **Ricerca NetFriend:**
 - [] **Servizio Rest con pagina per la registrazione:**
+- [] **Gestione messaggio custom al client**
+- [] **Se la stanza già esiste inviare messaggio**
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.
