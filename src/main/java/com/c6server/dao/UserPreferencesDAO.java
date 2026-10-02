@@ -2,6 +2,7 @@ package com.c6server.dao;
 
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.model.UserProfileEntity;
+import com.c6server.model.UserProfileSearchEntity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -204,6 +205,57 @@ public class UserPreferencesDAO {
         }
         return nicknames;
     }
+
+    /*
+       Ricerca utente per e-mail
+    */
+    public String findByEmail(String email) throws SQLException {
+        String sql = "SELECT nickname FROM users WHERE email = ?;";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getString("nickname");
+                return null;
+            }
+        }
+    }
+
+    /*
+       Ricerca utente per preferenze
+    */
+    public List<String> findUsersByPreferences(UserProfileSearchEntity search) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT DISTINCT nickname FROM user_preferences WHERE nickname IN (SELECT nickname FROM users)");
+
+        List<String> params = new ArrayList<>();
+
+        if (search.getEta() != null)                   { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getEta().name()); }
+        if (search.getGenere() != null)                { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getGenere().name()); }
+        if (search.getOrientamento() != null)          { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getOrientamento().name()); }
+        if (search.getOccupazione() != null)           { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getOccupazione().name()); }
+        if (search.getAreaGeografica() != null)        { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getAreaGeografica().name()); }
+        if (search.getRegione() != null)               { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getRegione().name()); }
+        if (search.getHobby() != null)                 { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getHobby().name()); }
+        if (search.getSport() != null)                 { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getSport().name()); }
+        if (search.getGenereMusicale() != null)        { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getGenereMusicale().name()); }
+        if (search.getGenereCinematografico() != null) { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getGenereCinematografico().name()); }
+        if (search.getComunitaVirtuale() != null)      { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getComunitaVirtuale().name()); }
+        if (search.getOdiCordiali() != null)           { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getOdiCordiali().name()); }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setString(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                List<String> nicknames = new ArrayList<>();
+                while (rs.next()) {
+                    nicknames.add(rs.getString("nickname"));
+                }
+                return nicknames;
+            }
+        }
+    }
+
 
     // ------------------------------------------------------------------
     // HELPER PRIVATI

@@ -60,6 +60,11 @@ public class NetFriendSearchPacket {
     }
 
     public byte[] getLength() {
+
+        if (netFriends.isEmpty()) {
+            return new byte[]{ 0x00, 0x04 };
+        }
+
         int lengthNetFriends = 2;
         int status = 0;
         int unknowByte = 2;
@@ -87,7 +92,11 @@ public class NetFriendSearchPacket {
         netFriendSearchPacket.write(getCount());
         netFriendSearchPacket.write(getLength());
         netFriendSearchPacket.write(getNumNetFriends());
-        if(lengthNetFriends() > 0) netFriendSearchPacket.write(getLengthWithNetFriends());
+        if (lengthNetFriends() > 0) {
+            netFriendSearchPacket.write(getLengthWithNetFriends());
+        } else {
+            netFriendSearchPacket.write(new byte[]{ 0x00, 0x00 });
+        }
 
 
         System.out.println("LOG PACCHETTO COMPLETO: NET FRIENDS SEARCH PACKET");
