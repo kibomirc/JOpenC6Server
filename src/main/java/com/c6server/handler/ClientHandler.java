@@ -8,10 +8,7 @@ import com.c6server.dao.NetFriendsDAO;
 import com.c6server.dao.RoomDAO;
 import com.c6server.dao.UserDAO;
 import com.c6server.dao.UserPreferencesDAO;
-import com.c6server.model.LoginEntity;
-import com.c6server.model.MessageRequest;
-import com.c6server.model.RoomProfileEntity;
-import com.c6server.model.UserProfileEntity;
+import com.c6server.model.*;
 import com.c6server.packet.*;
 import com.c6server.utils.*;
 import org.apache.logging.log4j.LogManager;
@@ -616,6 +613,21 @@ public class ClientHandler {
            attenzione va esternalizzato lo status: netFriendSearchPacket.addNetFriend("bigalex",C6EnumNetFriend.ONLY_NETFRIEND.getCode());
         */
 
+        // TODO ESTRARRE LE PREFERENZE DI RICERCA
+        UserProfileSearchEntity search = NetFriendSearchUtils.parsePreferences(decoded);
+
+        if (search.getEta() != null)                    System.out.println("ETA: "          + search.getEta());
+        if (search.getGenere() != null)                 System.out.println("GENERE: "        + search.getGenere());
+        if (search.getOrientamento() != null)           System.out.println("ORIENTAMENTO: "  + search.getOrientamento());
+        if (search.getOccupazione() != null)            System.out.println("OCCUPAZIONE: "   + search.getOccupazione());
+        if (search.getAreaGeografica() != null)         System.out.println("AREA GEO: "      + search.getAreaGeografica());
+        if (search.getRegione() != null)                System.out.println("REGIONE: "       + search.getRegione());
+        if (search.getHobby() != null)                  System.out.println("HOBBY: "         + search.getHobby());
+        if (search.getSport() != null)                  System.out.println("SPORT: "         + search.getSport());
+        if (search.getGenereMusicale() != null)         System.out.println("MUSICA: "        + search.getGenereMusicale());
+        if (search.getGenereCinematografico() != null)  System.out.println("CINEMA: "        + search.getGenereCinematografico());
+        if (search.getComunitaVirtuale() != null)       System.out.println("COMUNITA: "      + search.getComunitaVirtuale());
+        if (search.getOdiCordiali() != null)            System.out.println("ODI: "           + search.getOdiCordiali());
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
