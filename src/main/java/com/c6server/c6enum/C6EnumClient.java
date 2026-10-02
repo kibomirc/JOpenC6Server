@@ -6,6 +6,7 @@ public enum C6EnumClient {
     CLIENT_REQ_EXIT(0x02),    // logout
     REQ_PULS(0x0D),           // request button
     REQ_SEARCH_NETFRIEND(0x0E),
+    REQ_SEARCH_NETFRIEND_EMAIL(0x05), // ricerca per e-mail
     REQ_USERS(0x03),          // list connected users
     DEL_USERS(0x04),          // unlist connected users
     OL_MESSAGE(0x08),         // on line message

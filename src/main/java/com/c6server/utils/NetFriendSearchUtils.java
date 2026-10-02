@@ -3,6 +3,8 @@ package com.c6server.utils;
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 import com.c6server.model.UserProfileSearchEntity;
 
+import java.nio.charset.StandardCharsets;
+
 public class NetFriendSearchUtils {
 
     public static UserProfileSearchEntity parsePreferences(byte[] data) {
@@ -39,5 +41,11 @@ public class NetFriendSearchUtils {
         }
 
         return search;
+    }
+
+    public static String parseEmail(byte[] data) {
+        int offset = 12;
+        int emailLen = data[offset++] & 0xFF;
+        return new String(data, offset, emailLen, StandardCharsets.ISO_8859_1);
     }
 }

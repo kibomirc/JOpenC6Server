@@ -109,6 +109,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.REQ_SEARCH_NETFRIEND.getCode()) {
                     handleReqSearchNetFriend(decoded, out, nickname, conn);
                 }
+                if (cmdClient == C6EnumClient.REQ_SEARCH_NETFRIEND_EMAIL.getCode()) {
+                    handleReqSearchNetFriendEmail(decoded, out, nickname, conn);
+                }
                 if (cmdClient == C6EnumClient.CLIENT_REQ_EXIT.getCode()) {
                     handleLogoutUser(out, nickname, conn);
                 }
@@ -599,7 +602,7 @@ public class ClientHandler {
     }
 
     // -------------------------------------------------------------------------
-    // REQ_SEARCH_NETFRIEND — ricerca netFriends per profilo o e-mail
+    // REQ_SEARCH_NETFRIEND — ricerca netFriends per profilo
     // -------------------------------------------------------------------------
 
     private static void handleReqSearchNetFriend(byte[] decoded, OutputStream out, String nickname, Connection conn)
@@ -613,7 +616,6 @@ public class ClientHandler {
            attenzione va esternalizzato lo status: netFriendSearchPacket.addNetFriend("bigalex",C6EnumNetFriend.ONLY_NETFRIEND.getCode());
         */
 
-        // TODO ESTRARRE LE PREFERENZE DI RICERCA
         UserProfileSearchEntity search = NetFriendSearchUtils.parsePreferences(decoded);
 
         if (search.getEta() != null)                    System.out.println("ETA: "          + search.getEta());
@@ -628,6 +630,39 @@ public class ClientHandler {
         if (search.getGenereCinematografico() != null)  System.out.println("CINEMA: "        + search.getGenereCinematografico());
         if (search.getComunitaVirtuale() != null)       System.out.println("COMUNITA: "      + search.getComunitaVirtuale());
         if (search.getOdiCordiali() != null)            System.out.println("ODI: "           + search.getOdiCordiali());
+
+
+
+        NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
+        netFriendSearchPacket.setCount(0);
+        netFriendSearchPacket.addNetFriend("bigalex");
+
+
+        out.write(netFriendSearchPacket.getNetFriendSearchPacket());
+        out.flush();
+
+    }
+
+
+    // -------------------------------------------------------------------------
+    // REQ_SEARCH_NETFRIEND_EMAIL — ricerca netFriends per e-mail
+    // -------------------------------------------------------------------------
+
+    private static void handleReqSearchNetFriendEmail(byte[] decoded, OutputStream out, String nickname, Connection conn)
+            throws IOException, SQLException, NoSuchAlgorithmException {
+        // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
+
+        System.out.println("Richiesta netfriend profilo");
+
+
+        /* Parametri mokkati saranno da prelevare da db e aggiungere la lista con i vari status
+           attenzione va esternalizzato lo status: netFriendSearchPacket.addNetFriend("bigalex",C6EnumNetFriend.ONLY_NETFRIEND.getCode());
+        */
+
+        String email = NetFriendSearchUtils.parseEmail(decoded);
+        if (email != null)  System.out.println("Ricerca per email: " + email);
+
+
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
