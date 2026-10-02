@@ -44,7 +44,7 @@ Le attività attualmente pianificate includono:
 
 - [X] **Gestione Room NetFriend pubbliche:**
 - [X] **Gestione Room NetFriend private:**
-- [] **Ricerca NetFriend:**
+- [X] **Ricerca NetFriend:**
 - [] **Servizio Rest con pagina per la registrazione:**
 - [] **Gestione messaggio custom al client**
 - [] **Se la stanza già esiste inviare messaggio**

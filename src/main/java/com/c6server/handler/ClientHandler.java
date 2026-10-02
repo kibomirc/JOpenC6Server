@@ -110,7 +110,7 @@ public class ClientHandler {
                     handleReqSearchNetFriend(decoded, out, conn);
                 }
                 if (cmdClient == C6EnumClient.REQ_SEARCH_NETFRIEND_EMAIL.getCode()) {
-                    handleReqSearchNetFriendEmail(decoded, out, nickname, conn);
+                    handleReqSearchNetFriendEmail(decoded, out, conn);
                 }
                 if (cmdClient == C6EnumClient.CLIENT_REQ_EXIT.getCode()) {
                     handleLogoutUser(out, nickname, conn);
@@ -651,7 +651,7 @@ public class ClientHandler {
     // REQ_SEARCH_NETFRIEND_EMAIL — ricerca netFriends per e-mail
     // -------------------------------------------------------------------------
 
-    private static void handleReqSearchNetFriendEmail(byte[] decoded, OutputStream out, String nickname, Connection conn)
+    private static void handleReqSearchNetFriendEmail(byte[] decoded, OutputStream out, Connection conn)
             throws IOException, SQLException, NoSuchAlgorithmException {
         // TODO nei data che avrò nel decode si dovrà vedere le preferenze di ricerca ed effettuare la ricerca dei netfriend idonei
 
@@ -663,13 +663,14 @@ public class ClientHandler {
         */
 
         String email = NetFriendSearchUtils.parseEmail(decoded);
-        if (email != null)  System.out.println("Ricerca per email: " + email);
+        System.out.println("Ricerca per email: " + email);
 
-
+        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
+        String nickname = userPreferencesDAO.findByEmail(email);
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
-        netFriendSearchPacket.addNetFriend("bigalex");
+        if(nickname != null) netFriendSearchPacket.addNetFriend(nickname);
 
 
         out.write(netFriendSearchPacket.getNetFriendSearchPacket());
