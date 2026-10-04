@@ -1,5 +1,6 @@
 package com.c6server;
 
+import com.c6server.config.WebServer;
 import com.c6server.dao.DatabaseConnection;
 import com.c6server.handler.ClientHandler;
 import com.c6server.utils.HttpServerUtils;
@@ -30,6 +31,14 @@ public class C6ServerMain {
                 HttpServerUtils.startServer();
             } catch (Exception e) {
                 logger.error("Errore HTTP server", e);
+            }
+        });
+
+        threadPool.submit(() -> {
+            try {
+                WebServer.start();
+            } catch (Exception e) {
+                logger.error("Errore Tomcat", e);
             }
         });
 
