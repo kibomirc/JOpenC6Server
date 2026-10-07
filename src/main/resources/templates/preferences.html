@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Il tuo profilo</title>
+</head>
+<body>
+<form th:action="@{/profile}" method="post">
+    <table border="0" width="100%" cellspacing="0">
+        <tbody>
+        <tr>
+            <td><b><font color="#FF7735" face="MS Sans Serif" size="2"><br>Il tuo profilo ...
+                <span th:text="${nickname}"></span></font></b></td>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="5" cellspacing="0" width="100%" bgcolor="#FF9900">
+                    <tbody>
+                    <tr>
+                        <td width="33%" valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Età</font></b><br>
+                            <select name="eta">
+                                <option th:each="o, s : ${etaList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                        <td width="33%" valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Genere</font></b><br>
+                            <select name="genere">
+                                <option th:each="o, s : ${genereList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                        <td width="34%" valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Orientamento</font></b><br>
+                            <select name="orientamento">
+                                <option th:each="o, s : ${orientamentoList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Occupazione</font></b><br>
+                            <select name="occupazione">
+                                <option th:each="o, s : ${occupazioneList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                        <td valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Area Geografica</font></b><br>
+                            <select name="areaGeografica" id="areaGeografica">
+                                <option th:each="o, s : ${areaList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                        <td valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Regione / Provincia</font></b><br>
+                            <select name="regione" id="regione" disabled>
+                                <option th:each="o, s : ${regioneList}" th:value="${s.index}" th:text="${o}"
+                                        th:disabled="${s.index > 0} and ${o} == '----------'"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" th:each="n : ${#numbers.sequence(1, 3)}">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Hobby</font></b><br>
+                            <select th:name="'hobby' + ${n}">
+                                <option th:each="o, s : ${hobbyList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" th:each="n : ${#numbers.sequence(1, 3)}">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Sport</font></b><br>
+                            <select th:name="'sport' + ${n}">
+                                <option th:each="o, s : ${sportList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" th:each="n : ${#numbers.sequence(1, 3)}">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Gen. Musicale</font></b><br>
+                            <select th:name="'musica' + ${n}">
+                                <option th:each="o, s : ${musicaList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" th:each="n : ${#numbers.sequence(1, 3)}">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Gen. Cinematografico</font></b><br>
+                            <select th:name="'cinema' + ${n}">
+                                <option th:each="o, s : ${cinemaList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Comunità Virtuale</font></b><br>
+                            <select name="comunita">
+                                <option th:each="o, s : ${comunitaList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" th:each="n : ${#numbers.sequence(1, 3)}">
+                            <b><font color="#FFFFFF" face="MS Sans Serif" size="2">Odi Cordiali</font></b><br>
+                            <select th:name="'odio' + ${n}">
+                                <option th:each="o, s : ${odiList}" th:value="${s.index}" th:text="${o}"></option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table border="0" cellspacing="0" width="100%" cellpadding="10">
+        <tbody>
+        <tr>
+            <td align="center">
+                <input type="button" value="Indietro..." onclick="history.back()">
+                <input type="submit" value="Continua..." name="Submit">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+<script>
+    // Regione / Provincia attiva solo se l'area geografica è "Italia" (valore 2)
+    var area = document.getElementById('areaGeografica');
+    var regione = document.getElementById('regione');
+    function aggiornaRegione() { regione.disabled = area.value !== '2'; }
+    area.addEventListener('change', aggiornaRegione);
+    aggiornaRegione();
+</script>
+</body>
+</html>

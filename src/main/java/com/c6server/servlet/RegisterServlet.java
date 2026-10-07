@@ -46,7 +46,8 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (errors.isEmpty()) {
-            resp.sendRedirect(req.getContextPath() + "/");   // pagina dopo la registrazione
+            req.getSession().setAttribute("nickname", nickname);
+            resp.sendRedirect(req.getContextPath() + "preferences");
             return;
         }
 

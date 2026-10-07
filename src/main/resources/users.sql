@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
     nickname TEXT PRIMARY KEY,
-    nome TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     online BOOLEAN NOT NULL DEFAULT FALSE,
