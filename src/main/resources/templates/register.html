@@ -5,19 +5,130 @@
     <title>Registrazione</title>
 </head>
 <body>
-<h1>Registrazione</h1>
-
 <form th:action="@{/register}" method="post">
-    <label>Nick
-        <input type="text" name="nick" th:value="${nick}" />
-    </label>
-    <span th:if="${nickTaken}">Nick già registrato</span>
+    <table border="0" width="100%" cellspacing="0">
+        <tbody>
+        <tr>
+            <td><b><font color="#FF7735" face="MS Sans Serif" size="2"><br>Il tuo profilo</font></b></td>
+        </tr>
 
-    <label>Password
-        <input type="password" name="password" />
-    </label>
+        <!-- Nickname -->
+        <tr>
+            <td>
+                <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#FF7735" valign="bottom" width="25%">
+                            <strong><font color="#FFFFFF" face="MS Sans Serif" size="2">Nickname</font></strong><br>
+                            <input name="nickname" size="12" th:value="${nickname}">
+                        </td>
+                        <td bgcolor="#FF7735" valign="bottom" width="75%">
+                            <b th:if="${nickError}"><font color="#FFFF00" face="MS Sans Serif" size="2"><span th:text="${nickError}"></span><br></font></b>
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Il
+                                nickname deve essere di minimo 2 caratteri, massimo 10;
+                                puoi utilizzare lettere minuscole e numeri, ma non spazi,
+                                caratteri speciali e lettere accentate. Per favore, non
+                                scegliere parole o espressioni offensive per gli altri
+                                abitanti.</font>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
 
-    <button type="submit">Registrati</button>
+        <!-- Password -->
+        <tr>
+            <td>
+                <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#FF9900" valign="bottom" width="25%">
+                            <strong><font color="#FFFFFF" face="MS Sans Serif" size="2">Password</font></strong><br>
+                            <input type="password" name="password" size="12" maxlength="10">
+                        </td>
+                        <td bgcolor="#FF9900" valign="bottom" width="75%">
+                            <b th:if="${passwordError}"><font color="#FFFF00" face="MS Sans Serif" size="2"><span th:text="${passwordError}"></span><br></font></b>
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Solo
+                                lettere minuscole e numeri.</font>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Email -->
+        <tr>
+            <td>
+                <table border="0" cellpadding="5" cellspacing="0" width="100%">
+                    <tbody>
+                    <tr>
+                        <td bgcolor="#FF9900" valign="bottom" width="25%">
+                            <strong><font color="#FFFFFF" face="MS Sans Serif" size="2">Email</font></strong><br>
+                            <input name="email" size="12" th:value="${email}">
+                        </td>
+                        <td bgcolor="#FF9900" valign="bottom" width="75%">
+                            <b th:if="${emailError}"><font color="#FFFF00" face="MS Sans Serif" size="2"><span th:text="${emailError}"></span><br></font></b>
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Fai
+                                particolare attenzione all'indirizzo di posta elettronica:
+                                metti quello che usi regolarmente, perché lì, nel giro
+                                di poche ore, ti arriverà la conferma dell'iscrizione.
+                                Assicurati che sia corretto e che funzioni, e se cambia,
+                                aggiornalo subito!</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="middle" width="25%" bgcolor="#FF9900">
+                            <input type="radio" name="tipoEmail" value="1" th:checked="${tipoEmail} != '2'">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Invisibile</font>
+                        </td>
+                        <td valign="top" width="75%" bgcolor="#FF9900">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Nessuno
+                                vedrà la tua e-mail, che però è utilizzabile per
+                                ricerche, messaggi e cartoline. Potrai essere contattato,
+                                anche se anonimo.</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="middle" width="25%" bgcolor="#FF9900">
+                            <input type="radio" name="tipoEmail" value="2" th:checked="${tipoEmail} == '2'">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Visibile</font>
+                        </td>
+                        <td valign="top" width="75%" bgcolor="#FF9900">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">La
+                                tua e-mail appare nel profilo e potrà essere usata al di
+                                fuori di Atlantide: la scelta migliore per rendere la vita
+                                facile a chi ti cerca.</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="middle" width="25%" bgcolor="#FF9900">
+                            <input type="radio" name="info" value="0" th:checked="${info} != '1'">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Sì</font>
+                            <input type="radio" name="info" value="1" th:checked="${info} == '1'">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">No</font>
+                        </td>
+                        <td valign="top" width="75%" bgcolor="#FF9900">
+                            <font color="#FFFFFF" face="MS Sans Serif" size="1">Vuoi
+                                ricevere via e-mail le informazioni sugli aggiornamenti
+                                del sito?</font>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table border="0" cellspacing="0" width="100%" cellpadding="10">
+        <tbody>
+        <tr>
+            <td align="center"><input type="submit" value="Continua..." name="Submit"></td>
+        </tr>
+        </tbody>
+    </table>
 </form>
 </body>
 </html>

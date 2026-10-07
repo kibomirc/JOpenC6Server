@@ -21,6 +21,26 @@ public class UserDAO {
         }
     }
 
+    public void create(String nickname, String password, String email) throws SQLException {
+        String sql = "INSERT INTO users (nickname, password, email) VALUES (?, ?, ?);";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nickname);
+            pstmt.setString(2, AESUtils.encrypt(password));
+            pstmt.setString(3, email);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public boolean existsByEmail(String email) throws SQLException {
+        String sql = "SELECT 1 FROM users WHERE email = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public boolean exists(String nickname) throws SQLException {
         String sql = "SELECT 1 FROM users WHERE nickname = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
