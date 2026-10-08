@@ -1,5 +1,6 @@
 package com.c6server.config;
 
+import com.c6server.servlet.CompletedServlet;
 import com.c6server.servlet.ProfileServlet;
 import com.c6server.servlet.RegisterServlet;
 import org.apache.catalina.Context;
@@ -27,6 +28,9 @@ public class WebServer {
 
         Tomcat.addServlet(ctx, "preferences", new ProfileServlet());
         ctx.addServletMappingDecoded("/preferences", "preferences");
+
+        Tomcat.addServlet(ctx, "completed", new CompletedServlet());
+        ctx.addServletMappingDecoded("/completed", "completed");
 
         tomcat.start();
         logger.info("Tomcat in ascolto sulla porta " + PORT);

@@ -112,7 +112,7 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        session.invalidate();                               // registrazione conclusa
-        resp.sendRedirect(req.getContextPath() + "/");      // TODO: pagina finale
+        session.invalidate();
+        resp.sendRedirect(req.getContextPath() + "/completed");
     }
 }
