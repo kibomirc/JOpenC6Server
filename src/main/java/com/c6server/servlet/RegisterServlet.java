@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
@@ -17,40 +18,59 @@ import java.util.Set;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
+    private final UserService userService = new UserService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-        var engine = (TemplateEngine) getServletContext().getAttribute("templateEngine");
+            throws IOException, ServletException {
+        HttpSession session = req.getSession(false);
+        String nickname = session == null ? null : (String) session.getAttribute("nickname");
 
-        var app = JakartaServletWebApplication.buildApplication(getServletContext());
-        var ctx = new WebContext(app.buildExchange(req, resp));
+        if (nickname == null) {
+            showForm(req, resp, null, null, Set.of());
+            return;
+        }
 
-        resp.setContentType("text/html;charset=UTF-8");
-        engine.process("register", ctx, resp.getWriter());
+        String password = (String) session.getAttribute("password");
+        String email    = (String) session.getAttribute("email");
+        try {
+            showForm(req, resp, nickname, email, userService.validate(nickname, password, email));
+        } catch (SQLException e) {
+            throw new ServletException("Errore durante la registrazione", e);
+        }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
         req.setCharacterEncoding("UTF-8");
 
         String nickname = req.getParameter("nickname");
         String password = req.getParameter("password");
         String email    = req.getParameter("email");
 
-        UserService userService = new UserService();
         Set<UserService.RegisterError> errors;
         try {
-            errors = userService.register(nickname, password, email);
+            errors = userService.validate(nickname, password, email);
         } catch (SQLException e) {
             throw new ServletException("Errore durante la registrazione", e);
         }
 
-        if (errors.isEmpty()) {
-            req.getSession().setAttribute("nickname", nickname);
-            resp.sendRedirect(req.getContextPath() + "preferences");
+        if (!errors.isEmpty()) {
+            showForm(req, resp, nickname, email, errors);
             return;
         }
 
+        HttpSession session = req.getSession();
+        session.setAttribute("nickname", nickname);
+        session.setAttribute("password", password);
+        session.setAttribute("email", email);
+        resp.sendRedirect(req.getContextPath() + "/preferences");
+    }
+
+    private void showForm(HttpServletRequest req, HttpServletResponse resp,
+                          String nickname, String email,
+                          Set<UserService.RegisterError> errors) throws IOException {
         WebContext ctx = newContext(req, resp);
         ctx.setVariable("nickname", nickname);
         ctx.setVariable("email", email);

@@ -23,7 +23,7 @@ public final class ProfileOptionsEntity {
             "dirigente", "disoccupato/a", "fotografo/a", "giornalista", "grafico/a", "impiegato/a",
             "imprenditore/trice", "infermiere/a", "ingegnere", "insegnante", "medico", "musicista",
             "notaio", "operaio/a", "operatore/turistico", "pensionato/a", "procuratore legale",
-            "pubblicitario/a", "ricercatore/trice", "studente/essa", "altra", "agente immobiliare",
+            "ricercatore/trice", "studente/essa", "altra", "agente immobiliare",
             "quadro/funzionario", "farmacista", "istruttore sportivo", "suora", "prete", "filosofo/a");
 
     public static final List<String> AREA_GEOGRAFICA = List.of(
@@ -45,14 +45,14 @@ public final class ProfileOptionsEntity {
             "Mantova", "Massa Carrara", "Matera", "Messina", "Milano", "Modena", "Napoli", "Novara",
             "Nuoro", "Oristano", "Padova", "Palermo", "Parma", "Pavia", "Perugia", "Pesaro", "Pescara",
             "Piacenza", "Pisa", "Pistoia", "Pordenone", "Potenza", "Prato", "Ragusa", "Ravenna",
-            "Reggio Calabria", "Rieti", "Rimini", "Roma", "Rovigo", "Salerno", "Sassari", "Savona",
-            "Siena", "Siracusa", "Sondrio", "Taranto", "Teramo", "Terni", "Torino", "Trapani", "Trento",
-            "Treviso", "Trieste", "Udine", "Varese", "Venezia", "Verbania", "Vercelli", "Verona",
-            "Vibo Valentia", "Vicenza", "Viterbo");
+            "Reggio Calabria", "Reggio Emilia", "Rieti", "Rimini", "Roma", "Rovigo", "Salerno",
+            "Sassari", "Savona", "Siena", "Siracusa", "Sondrio", "Taranto", "Teramo", "Terni", "Torino",
+            "Trapani", "Trento", "Treviso", "Trieste", "Udine", "Varese", "Venezia", "Verbania",
+            "Vercelli", "Verona", "Vibo Valentia", "Vicenza", "Viterbo");
 
     public static final List<String> HOBBY = List.of(
-            "----------", "non definito", "arte/antiquariato", "bricolage", "cinema", "collezionismo",
-            "computer", "cucina", "danza", "esoterismo", "filatelia", "fotografia", "fumetti",
+            "----------", "non definito", "nessuno", "arte/antiquariato", "bricolage", "cinema",
+            "collezionismo", "computer", "cucina", "danza", "esoterismo", "filatelia", "fumetti",
             "giardinaggio", "internet", "lettura", "moto/motori", "musica (ascoltarla)",
             "musica (suonarla)", "ozio", "viaggi", "sesso", "sport (praticarlo)", "sport (in tv!)",
             "teatro", "altro", "discoteche", "scienze", "giochi da tavolo", "scrivere");

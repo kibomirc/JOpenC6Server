@@ -2,6 +2,8 @@ package com.c6server.service;
 
 import com.c6server.dao.DatabaseConnection;
 import com.c6server.dao.UserDAO;
+import com.c6server.dao.UserPreferencesDAO;
+import com.c6server.model.UserProfileEntity;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,7 +21,8 @@ public class UserService {
     private static final int NICK_MAX_LENGTH = 10;
     private static final String PASSWORD_PATTERN = "[a-z0-9]+";
 
-    public Set<RegisterError> register(String nickname, String password, String email)
+
+    public Set<RegisterError> validate(String nickname, String password, String email)
             throws SQLException {
         Set<RegisterError> errors = EnumSet.noneOf(RegisterError.class);
 
@@ -51,12 +54,29 @@ public class UserService {
             if (emailValid && userDAO.existsByEmail(email)) {
                 errors.add(RegisterError.EMAIL_TAKEN);
             }
-
-            if (errors.isEmpty()) {
-                userDAO.create(nickname, password, email);
-            }
         }
 
+        return errors;
+    }
+
+
+    public Set<RegisterError> register(String nickname, String password, String email,
+                                       UserProfileEntity profile) throws SQLException {
+        Set<RegisterError> errors = validate(nickname, password, email);
+        if (!errors.isEmpty()) {
+            return errors;
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                new UserDAO(conn).create(nickname, password, email);
+                new UserPreferencesDAO(conn).saveProfile(nickname, profile);
+            } catch (SQLException | RuntimeException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
         return errors;
     }
 }
