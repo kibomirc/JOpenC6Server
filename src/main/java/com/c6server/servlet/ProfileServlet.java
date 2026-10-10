@@ -112,7 +112,7 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        session.invalidate();
+        session.setAttribute("nickname", nickname);
         resp.sendRedirect(req.getContextPath() + "/completed");
     }
 }

@@ -1,10 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Registrazione completata con successo!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrazione Completata!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FF7735 0%, #FFA94D 50%, #FFD08A 100%);
+        }
+
+        .card {
+            width: 360px;
+            height: 360px;
+            max-width: 90vw;
+            max-height: 90vw;
+            background: #FFF8F1;
+            border-radius: 24px;
+            box-shadow: 0 20px 45px rgba(150, 60, 0, 0.35);
+            border-top: 8px solid #FF7735;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            gap: 20px;
+        }
+
+        .icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: #FF7735;
+            color: #fff;
+            font-size: 44px;
+            line-height: 76px;
+            box-shadow: 0 6px 16px rgba(255, 119, 53, 0.5);
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: #C2410C;
+        }
+
+        .message {
+            font-size: 1rem;
+            color: #5C3D2E;
+            line-height: 1.5;
+        }
+
+        .nickname {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            background: #FFE4D1;
+            color: #C2410C;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body>
-
+<div class="card">
+    <div class="icon">&#10003;</div>
+    <h1>Registrazione completata!</h1>
+    <p class="message">
+        Registrazione completata con successo per il nickname:<br>
+        <span class="nickname" th:text="${nickname}">nickname</span>
+    </p>
+</div>
 </body>
 </html>
