@@ -85,6 +85,9 @@ public class ClientHandler {
                 if (cmdClient == C6EnumClient.PONG.getCode()) {
                     PingManagerUtils.getInstance().onPongReceived(nickname);
                 }
+                if (cmdClient == C6EnumClient.CHNG_STATUS.getCode()) {
+                    handleChangeStatus(decoded, out, nickname,conn);
+                }
                 if (cmdClient == C6EnumClient.REQ_ROOM_LIST.getCode()) {
                     handleReqRoomList(nickname,conn,out);
                 }
@@ -301,6 +304,19 @@ public class ClientHandler {
         srvMessagePacket.setMessaggio(messageRequest.getMessaggio());
 
         ClientRegistry.sendTo(messageRequest.getNickDestinatario(), srvMessagePacket.getSrvMessagePacket());
+    }
+
+    // ------------------------------------------------------------------------
+    // CHNG_STATUS - gestione cambio stato user
+    // ------------------------------------------------------------------------
+    private static void handleChangeStatus(byte[] decoded, OutputStream out, String nickname, Connection conn) {
+         UserDAO userDAO = new UserDAO(conn);
+
+        try {
+            userDAO.updateStatus(nickname,UsersUtils.parseStatus(decoded));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // ------------------------------------------------------------------------

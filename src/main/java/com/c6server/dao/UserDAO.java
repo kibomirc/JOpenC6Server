@@ -1,5 +1,6 @@
 package com.c6server.dao;
 
+import com.c6server.c6enum.C6EnumStatus;
 import com.c6server.utils.AESUtils;
 
 import java.sql.*;
@@ -118,6 +119,13 @@ public class UserDAO {
             System.out.println("Reset online all'avvio: " + aggiornati + " utenti impostati offline");
             return aggiornati;
         }
+    }
+
+    public void updateStatus(String nickname, C6EnumStatus status) throws SQLException {
+        if (status == null) {
+            throw new IllegalArgumentException("Status C6 sconosciuto per l'utente: " + nickname);
+        }
+        updateStatus(nickname, status.name());
     }
 
 }
