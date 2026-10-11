@@ -11,23 +11,17 @@ L'obiettivo principale del progetto è replicare e supportare accuratamente le s
 
 ## Funzionalità Supportate
 
-## Funzionalità Supportate
+Il server implementa **tutti i comandi previsti dal documento ufficiale di OpenC6**, a cura di Alessio Periloso (*BigAlex*), con l'eccezione indicata più sotto..
 
-Attualmente il server implementa i seguenti componenti core del protocollo:
+OpenC6 era orientato soprattutto alla realizzazione del **client**: la gestione delle stanze era demandata al server ufficiale di Atlantide e non è documentata. Il protocollo delle stanze è stato quindi **ricostruito** analizzando con **Wireshark** il traffico del progetto [c6online.it](https://c6online.it) di Daniele *DaxWeb* Ciarapica.
 
-* **Sicurezza & Autenticazione**
-  * Codifica dei pacchetti nativi del protocollo C6.
-  * Gestione e crittografia dell'handshake per Nickname e Password.
-* **Flusso di Connessione**
-  * Gestione delle richieste di tipo `infoserverlogin`.
-  * Invio del messaggio di benvenuto iniziale (`welcomeMessage` / MOTD).
-* **Messaggistica**
-  * Invio e ricezione di messaggi privati tra utenti tramite `SRV_MESSAGE`.
-* **Sincronizzazione & Stato**
-  * Gestione dei pulsanti e dell'interfaccia: elaborazione delle richieste `reqPuls` e invio dei dati `sendPuls` per l'aggiornamento dei componenti grafici.
-  * Gestione della lista contatti: elaborazione della richiesta di elenco (`reqUsers`) e distribuzione degli utenti connessi (`sendUsers`) in tempo reale.
-  * Notifica di nuovo utente connesso (`newUser`) per aggiornare i netfriend online in tempo reale.
-  * Notifica di disconnessione utente (`EXIT_USER`) per aggiornare i netfriend in tempo reale.
+All'inizio degli anni 2000 Alessio Periloso (*BigAlex*) rilasciò una versione **open source del server**, scritta in **Visual Basic 5**. I proprietari del progetto, però, modificavano spesso il protocollo, e quel server è diventato incompatibile con le versioni più recenti del client, compresa la `c6-4.2.c6tinb426.exe`.
+
+-----
+### Funzionalità non implementate
+
+- **IP visibile**: nel client l'utente può scegliere di rendere visibile il proprio indirizzo IP, che viene poi mostrato nel suo profilo. Questa funzionalità non è implementata dal server.
+
 ---
 
 ##  Architettura Tecnica
@@ -42,14 +36,15 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
-- [X] **Gestione Room NetFriend pubbliche:**
-- [X] **Gestione Room NetFriend private:**
-- [X] **Ricerca NetFriend:**
-- [] **Servizio Rest con pagina per la registrazione:**
+- [] **Orario dell ultimo accesso**
+- [] **Stato del netfriend nel profilo**
+- [] **Stato del netfriend cercato**
 - [] **Gestione messaggio custom al client**
 - [] **Se la stanza già esiste inviare messaggio**
 ---
 
 Progetto sviluppato a scopo di studio e preservazione digitale dei vecchi protocolli di messaggistica.
-Si ringrazia Alessio (BiGAlex) Periloso per aver effettuato il reversing del protocollo.
+
+Si ringrazia Alessio (*BigAlex*) Periloso per aver effettuato il reversing del protocollo.
+Si ringrazia inoltre Daniele (*DaxWeb*) Ciarapica per aver messo online il servizio [c6online.it](https://c6online.it), grazie al quale è stato possibile analizzare le parti del protocollo mancanti.
 
