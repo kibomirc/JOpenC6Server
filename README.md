@@ -36,6 +36,7 @@ Il server si interfaccia a un database relazionale leggero ad alte prestazioni:
 
 Le attività attualmente pianificate includono:
 
+- [] **Memorizzazione cambio stato utente**
 - [] **Orario dell ultimo accesso**
 - [] **Stato del netfriend nel profilo**
 - [] **Stato del netfriend cercato**
