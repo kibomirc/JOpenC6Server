@@ -53,11 +53,13 @@ public class UserPreferencesDAO {
             """;
 
     private static final String SQL_SELECT_USERS_BY_PREF = """
-            SELECT nickname
-            FROM user_preferences
-            WHERE pref_val = ?
-            ORDER BY nickname
-            """;
+        SELECT DISTINCT up.nickname
+        FROM user_preferences up
+        JOIN users u ON u.nickname = up.nickname
+        WHERE up.pref_val = ?
+          AND u.online = TRUE
+        ORDER BY up.nickname
+        """;
 
     private final Connection conn;
 
@@ -223,9 +225,9 @@ public class UserPreferencesDAO {
     /*
        Ricerca utente per preferenze
     */
-    public List<String> findUsersByPreferences(UserProfileSearchEntity search) throws SQLException {
+    public List<String> findUsersByPreferences(UserProfileSearchEntity search, String ownNick) throws SQLException {
         StringBuilder sql = new StringBuilder(
-                "SELECT DISTINCT nickname FROM user_preferences WHERE nickname IN (SELECT nickname FROM users)");
+                "SELECT DISTINCT nickname FROM user_preferences WHERE nickname IN (SELECT nickname FROM users WHERE online = TRUE)");
 
         List<String> params = new ArrayList<>();
 
@@ -241,6 +243,12 @@ public class UserPreferencesDAO {
         if (search.getGenereCinematografico() != null) { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getGenereCinematografico().name()); }
         if (search.getComunitaVirtuale() != null)      { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getComunitaVirtuale().name()); }
         if (search.getOdiCordiali() != null)           { sql.append(" AND nickname IN (SELECT nickname FROM user_preferences WHERE pref_val = ?)"); params.add(search.getOdiCordiali().name()); }
+
+        // esclude chi sta cercando (dopo i filtri, per mantenere l'ordine dei ?)
+        if (ownNick != null) {
+            sql.append(" AND nickname <> ?");
+            params.add(ownNick);
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
