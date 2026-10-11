@@ -2,6 +2,7 @@ package com.c6server;
 
 import com.c6server.config.WebServer;
 import com.c6server.dao.DatabaseConnection;
+import com.c6server.dao.UserDAO;
 import com.c6server.handler.ClientHandler;
 import com.c6server.utils.HttpServerUtils;
 import com.c6server.utils.PingManagerUtils;
@@ -23,6 +24,12 @@ public class C6ServerMain {
     private static final ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws IOException, SQLException {
+
+        // All'avvio nessuno puo' essere online: azzera i flag rimasti da un crash/stop precedente
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            int resettati = new UserDAO(conn).resetAllOnline();
+            logger.info("Reset online all'avvio: " + resettati + " utenti");
+        }
 
         PingManagerUtils.getInstance().start();
 

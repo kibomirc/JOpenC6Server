@@ -110,5 +110,15 @@ public class UserDAO {
         }
     }
 
+    // Imposta offline tutti gli utenti (da chiamare all'avvio del server)
+    public int resetAllOnline() throws SQLException {
+        String sql = "UPDATE users SET online = FALSE WHERE online = TRUE;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            int aggiornati = pstmt.executeUpdate();
+            System.out.println("Reset online all'avvio: " + aggiornati + " utenti impostati offline");
+            return aggiornati;
+        }
+    }
+
 }
 
