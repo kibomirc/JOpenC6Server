@@ -1,6 +1,7 @@
 package com.c6server.packet;
 
 import com.c6server.c6enum.C6EnumNetFriend;
+import com.c6server.c6enum.C6EnumStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,10 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.c6server.c6enum.C6EnumNetFriend.*;
+
 public class NetFriendSearchPacket {
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x16 };
 
     private int count;
+    private C6EnumStatus statusUser;
+    private C6EnumNetFriend statusNetfriend;
 
     private List<String> netFriends = new ArrayList();
 
@@ -35,8 +40,9 @@ public class NetFriendSearchPacket {
         return netFriends.size();
     }
 
-    public void addNetFriend(String nickname) {
+    public void addNetFriend(String nickname, C6EnumStatus statusUser) {
         netFriends.add(nickname);
+        this.statusUser = statusUser;
     }
 
     public byte[] getNumNetFriends() {
@@ -53,10 +59,21 @@ public class NetFriendSearchPacket {
             byte[] nickBytes = nick.getBytes(StandardCharsets.ISO_8859_1);
             buf.write((byte) nickBytes.length);
             buf.write(nickBytes);
-            buf.write(C6EnumNetFriend.ONLY_NETFRIEND.getCode());
+            buf.write(getStatusNetfriend(statusUser).getCode());
         }
         buf.write(new byte[]{ 0x00, 0x00 });
         return buf.toByteArray();
+    }
+
+    private C6EnumNetFriend getStatusNetfriend(C6EnumStatus statusUser) {
+        if (statusUser == null) {
+            return null;
+        }
+        return switch (statusUser) {
+            case DISPONIBILE    -> AVAILABLE;
+            case SOLO_NETFRIEND -> ONLY_NETFRIEND;
+            case IMPEGNATO      -> OCCUPIED;
+        };
     }
 
     public byte[] getLength() {

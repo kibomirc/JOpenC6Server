@@ -98,6 +98,25 @@ public class UserDAO {
         }
     }
 
+    public C6EnumStatus getStatusNetfriend(String nickname) throws SQLException {
+        String sql = "SELECT status FROM users WHERE nickname = ?;";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nickname);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String status = rs.getString("status");
+                    try {
+                        return C6EnumStatus.valueOf(status);
+                    } catch (IllegalArgumentException e) {
+                        throw new SQLException("Status sconosciuto in tabella per l'utente "
+                                + nickname + ": " + status, e);
+                    }
+                }
+                throw new SQLException("Utente non trovato: " + nickname);
+            }
+        }
+    }
+
     public String getPassword(String nickname) throws SQLException {
         String sql = "SELECT password FROM users WHERE nickname = ?;";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {

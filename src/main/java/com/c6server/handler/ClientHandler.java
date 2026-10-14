@@ -649,12 +649,14 @@ public class ClientHandler {
 
 
         UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
+        UserDAO userDAO = new UserDAO(conn);
+
         List<String> nicknames = userPreferencesDAO.findUsersByPreferences(search, ownNick);
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
         for(String nickname: nicknames) {
-            netFriendSearchPacket.addNetFriend(nickname);
+            netFriendSearchPacket.addNetFriend(nickname, userDAO.getStatusNetfriend(nickname));
         }
 
         out.write(netFriendSearchPacket.getNetFriendSearchPacket());
@@ -681,12 +683,14 @@ public class ClientHandler {
         String email = NetFriendSearchUtils.parseEmail(decoded);
         System.out.println("Ricerca per email: " + email);
 
+        UserDAO userDAO = new UserDAO(conn);
+
         UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO(conn);
         String nickname = userPreferencesDAO.findByEmail(email);
 
         NetFriendSearchPacket netFriendSearchPacket = new NetFriendSearchPacket();
         netFriendSearchPacket.setCount(0);
-        if(nickname != null) netFriendSearchPacket.addNetFriend(nickname);
+        if(nickname != null) netFriendSearchPacket.addNetFriend(nickname,userDAO.getStatusNetfriend(nickname));
 
 
         out.write(netFriendSearchPacket.getNetFriendSearchPacket());

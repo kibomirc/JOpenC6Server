@@ -39,7 +39,7 @@ Le attività attualmente pianificate includono:
 - [X] **Memorizzazione cambio stato utente**
 - [] **Orario dell ultimo accesso**
 - [] **Stato del netfriend nel profilo**
-- [] **Stato del netfriend cercato**
+- [X] **Stato del netfriend cercato**
 - [] **Gestione messaggio custom al client**
 - [] **Se la stanza già esiste inviare messaggio**
 ---
