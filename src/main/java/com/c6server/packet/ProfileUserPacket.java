@@ -1,6 +1,8 @@
 package com.c6server.packet;
 
+import com.c6server.c6enum.C6EnumNetFriend;
 import com.c6server.c6enum.C6EnumRoomPreferences;
+import com.c6server.c6enum.C6EnumStatus;
 import com.c6server.c6enum.C6EnumUserProfilePreferences;
 
 import java.io.ByteArrayOutputStream;
@@ -11,14 +13,17 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.c6server.c6enum.C6EnumNetFriend.*;
 import static com.c6server.packet.InfoLoginPacket.concatBytes;
 
 public class ProfileUserPacket {
 
     private final byte[] SERVER_COMMAND = new byte[] { 0x20, 0x14 };
-    private final byte[] UNKNOW_BYTE_1 = new byte[] { 0x00, 0x00, 0x00, 0x00 };
-    private final byte[] UNKNOW_BYTE_2 = new byte[] { 0x20, 0x00 };
+    private final byte[] UNKNOW_BYTE_1 = new byte[] { 0x00, 0x00, 0x00, 0x00 }; // INDIRIZZO IP
     private final byte[] NULL_PREFERENCES = new byte[] { 0x00 };
+
+    private C6EnumStatus statusUser;
+    private C6EnumNetFriend statusNetfriend;
 
     private Integer count;
     private String nickname;
@@ -33,8 +38,8 @@ public class ProfileUserPacket {
                    69 76 61 6E  → "ivan"
                    6A 28 24 F0  → timestamp (09 giugno 2026 16:36)
                    00 00 00 00  → UNKNOW_BYTE
-                   20 00        → header blocco preferenze
-                   00           → numero preferenze (0)
+                   20           → stato del netfriend
+                   00 00          → numero preferenze (0)
      */
 
 
@@ -47,9 +52,9 @@ public class ProfileUserPacket {
                     06           → lunghezza nickname (6 byte)
                     64 61 78 77 65 62 → "daxweb"
                     6A 27 AF EB  → timestamp (09 giugno 2026 17:45)
-                    00 00 00 00  → UNKNOW_BYTE
-                    20 00        → header blocco preferenze
-                    14           → numero preferenze (20)
+                    00 00 00 00  → Indirizzo ip
+                    20           → header blocco preferenze
+                    00 14        → numero preferenze (20)
                     01 06        → ETA          → ETA_36_45
                     02 02        → GENERE       → MASCHILE
                     03 02        → ORIENTAMENTO → ORIENTAMENTO_ETERO
@@ -84,6 +89,10 @@ public class ProfileUserPacket {
         this.epochSeconds = epochSeconds;
     }
 
+    public void setStatusNetFriend(C6EnumStatus statusUser) {
+        this.statusUser = statusUser;
+    }
+
     public String getNickname() {
         return nickname;
     }
@@ -91,8 +100,14 @@ public class ProfileUserPacket {
     public byte[] getPreferences() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        // contatore su 1 byte
-        out.write(preferences.size() & 0xFF);
+        int count = preferences.size();
+        if (count > 0xFFFF) {
+            throw new IllegalStateException("Errore: troppe preferenze : " + count);
+        }
+
+        // contatore su 2 byte (big-endian)
+        out.write((count >>> 8) & 0xFF);
+        out.write(count & 0xFF);
 
         // per ogni preferenza: indice + valore
         for (UserPreference pref : preferences) {
@@ -141,8 +156,8 @@ public class ProfileUserPacket {
 
         int lenRoomName = getLengthWithNickname().length;
         int lenTimestamp = 4;
+        int statusUserLen = 1;
         int lenUnknowByte1 = UNKNOW_BYTE_1.length;
-        int lenUnknowByte2 = UNKNOW_BYTE_2.length;
 
 
         int lenPreferencesByte = 0;
@@ -153,7 +168,7 @@ public class ProfileUserPacket {
             lenPreferencesByte = NULL_PREFERENCES.length;
         }
 
-        int totalLen = lenRoomName + lenTimestamp + lenUnknowByte1 + lenUnknowByte2 + lenPreferencesByte;
+        int totalLen = lenRoomName + lenTimestamp + lenUnknowByte1 + statusUserLen + lenPreferencesByte;
 
         byte[] totalLenBytes = new byte[2];
         totalLenBytes[0] = (byte) ((totalLen >> 8) & 0xFF);
@@ -172,7 +187,7 @@ public class ProfileUserPacket {
         profileUserPacketComposit.write(getLengthWithNickname());
         profileUserPacketComposit.write(getEpochToBytes());
         profileUserPacketComposit.write(UNKNOW_BYTE_1);
-        profileUserPacketComposit.write(UNKNOW_BYTE_2);
+        profileUserPacketComposit.write(getStatusNetfriend(statusUser).getCode());
 
         if(this.getPreferences().length > 0) {
             profileUserPacketComposit.write(getPreferences());
@@ -187,6 +202,17 @@ public class ProfileUserPacket {
 
         return profileRoomPacket;
 
+    }
+
+    private C6EnumNetFriend getStatusNetfriend(C6EnumStatus statusUser) {
+        if (statusUser == null) {
+            return null;
+        }
+        return switch (statusUser) {
+            case DISPONIBILE    -> AVAILABLE;
+            case SOLO_NETFRIEND -> ONLY_NETFRIEND;
+            case IMPEGNATO      -> OCCUPIED;
+        };
     }
 
 

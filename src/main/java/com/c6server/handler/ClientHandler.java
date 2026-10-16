@@ -582,6 +582,7 @@ public class ClientHandler {
             ProfileUserPacket profileUserPacket = new ProfileUserPacket();
             profileUserPacket.setNickname(nickProfile);
             profileUserPacket.setCount(0);
+            profileUserPacket.setStatusNetFriend(userDAO.getStatusNetfriend(nickname));
             profileUserPacket.setEpochSeconds(563166600); // TODO aggiungere campo idleTime in tabella user in questo formato
 
             for (C6EnumUserProfilePreferences pref : profilo.toFlatList()) {
